@@ -21,8 +21,7 @@
 
         <div data-role="footer" data-position="fixed">
             <h4><a href="{{url('/')}}">Home</a></h4>
-        </div><!-- /footer -->
-
+        </div>
     </div>
 </body>
 </html>
