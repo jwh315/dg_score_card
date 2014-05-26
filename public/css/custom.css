@@ -1,0 +1,63 @@
+.hole-number {
+	text-align: center;
+}
+
+.main-header {
+	overflow: visible !important;
+}
+
+.score-button {
+	display: inline-block;
+	width: 35%;
+}
+
+.player-grid {
+	border: 1px solid #eee;
+	margin: 3px;
+}
+
+.player-name-grid {
+	margin-top: 17px;
+}
+
+.player-name {
+	padding-left: 15px;
+}
+
+.score-button-container {
+	position: relative;
+	height: 50px;
+}
+
+.hole-score {
+	position: absolute;
+	top: 33%;
+	left: 49%;
+}
+
+.plus {
+	position: absolute;
+	top: -9%;
+}
+
+.minus {
+	position: absolute;
+	left: 59%;
+	top: -9%;
+}
+
+.player-grid:nth-child(4n+1) {
+	background: #83C5D1;
+}
+
+.player-grid:nth-child(4n+2) {
+	background: #B2D9D6;
+}
+
+.player-grid:nth-child(4n+3) {
+	background: #C3DCBF;
+}
+
+.player-grid:nth-child(4n+4) {
+	background: #C7DAD4;
+}
