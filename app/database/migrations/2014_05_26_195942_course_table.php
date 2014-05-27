@@ -34,6 +34,7 @@ class CourseTable extends Migration {
 		Schema::create('matches', function($table){
 			$table->increments('id');
 			$table->integer('course_id');
+			$table->string('match_name');
 			$table->boolean('complete');
 		});
 

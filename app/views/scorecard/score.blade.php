@@ -66,4 +66,6 @@
 		</div>
 	</div>
 
+	<p>{{Session::get('current_match')}}</p>
+
 @stop
