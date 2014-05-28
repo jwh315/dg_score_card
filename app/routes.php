@@ -25,8 +25,10 @@ Route::get('score/', function()
 Route::get('start-match/', function()
 {
 	$courses = Course::all();
-	return View::make('scorecard.start_match')
-		->with('courses', $courses);
+	$json = array();
+	$json['html'] = View::make('scorecard.start_match')
+						->with('courses', $courses)->render();
+	return Response::json($json);
 });
 
 Route::get('register-match/course_id/{id}', function($id) {

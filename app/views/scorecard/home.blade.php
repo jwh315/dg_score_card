@@ -1,6 +1,6 @@
 @extends('master')
 @section('content')
-	<a href="{{url('start-match/')}}" data-role="button">Start A Match</a>
-	<a href="#" data-role="button">Join Existing Match</a>
-	<a href="{{url('score/')}}" data-role="button">Play!</a>
+	<a href="#" id="start_match" data-role="button">Start A Match</a>
+	<a href="#" id="join_match" data-role="button">Join Existing Match</a>
+	<a href="#" id="play_round" data-role="button">Play!</a>
 @stop

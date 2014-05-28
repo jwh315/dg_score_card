@@ -15,7 +15,7 @@
             <h1 class="main-header" >PVDGC Score Card</h1>
         </div>
 
-        <div data-role="content">
+        <div data-role="content" id="content">
             @yield('content')
         </div>
 
@@ -23,5 +23,9 @@
             <h4><a href="{{url('/')}}">Home</a></h4>
         </div>
     </div>
+    <script src="{{asset('js/main.js')}}"></script>
+    <script>
+        match.init();
+    </script>
 </body>
 </html>
