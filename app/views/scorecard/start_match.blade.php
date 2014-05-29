@@ -7,7 +7,7 @@
 <ul data-role="listview" data-inset="true">
 	@foreach($courses as $course)
 		<li>
-			<a href="{{url('register-match/course_id/' . $course->id)}}">{{{$course->course_name}}}</a>
+			<a class="course" id="{{{$course->id}}}" href="#">{{{$course->course_name}}}</a>
 		</li>
 	@endforeach
 </ul>

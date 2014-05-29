@@ -3,7 +3,6 @@ var match = {
 
 	init: function() {
 		$('#start_match').click(match.startMatch);
-
 	},
 
 	startMatch: function() {
@@ -12,7 +11,19 @@ var match = {
 			dataType: 'json',
 			type: 'post',
 			success: function(data) {
-				console.log(data.html);
+				document.getElementById('content').innerHTML = data.html;
+				refreshLayout();
+				$('.course').click(match.registerCourse);
+			}
+		});
+	},
+
+	registerCourse: function() {
+		var id = $(this).attr('id');
+		$.ajax({
+			url: 'register-match/' + id,
+			dataType: 'json',
+			success: function(data) {
 				document.getElementById('content').innerHTML = data.html;
 				refreshLayout();
 			}
