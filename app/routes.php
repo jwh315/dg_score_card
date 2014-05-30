@@ -23,7 +23,7 @@ Route::get('start-match/', function()
 	$courses = Course::all();
 	$json = array();
 	$json['html'] = View::make('scorecard.start_match')
-						->with('courses', $courses)->render();
+					->with('courses', $courses)->render();
 	return Response::json($json);
 });
 
@@ -39,6 +39,15 @@ Route::get('register-match/{id}', function($id) {
 
 	$json = array();
 	$json['html'] = View::make('scorecard.score')->render();
+	return Response::json($json);
+});
+
+Route::get('show-existing/', function() {
+	$matches = Match::where('complete', 0)->orderBy('id', 'DESC')->get();
+	$json = array();
+	$json['html'] = View::make('scorecard.existing-matches')
+					->with('matches', $matches)
+					->render();
 	return Response::json($json);
 });
 

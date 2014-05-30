@@ -3,6 +3,8 @@ var match = {
 
 	init: function() {
 		$('#start_match').click(match.startMatch);
+		$('#join_match').click(match.showExistingMatches);
+		$('.go-home').click(match.goHome);
 	},
 
 	startMatch: function() {
@@ -28,7 +30,23 @@ var match = {
 				refreshLayout();
 			}
 		});
-	}
+	},
+
+	showExistingMatches: function() {
+		$.ajax({
+			url: 'show-existing/',
+			dataType: 'json',
+			success: function(data) {
+				document.getElementById('content').innerHTML = data.html;
+				refreshLayout();
+				$('.existing-matches').click(match.joinMatch);
+			}
+		});
+	},
+
+	joinMatch: function() {
+
+	},
 }
 
 var scorecard = {
@@ -42,3 +60,5 @@ var player = {
 function refreshLayout() {
 	$("div[data-role=page]").page("destroy").page();
 }
+
+match.init();
