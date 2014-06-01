@@ -1,11 +1,9 @@
 @extends('master')
 @section('content')
-	<a href="#" id="start_match" data-role="button">Start A Match</a>
+	<button id="start_match" type="button" class="btn btn-primary btn-lg btn-block">Start A Match</button>
 
 	@if($activeMatches)
-		<a href="#" id="join_match" data-role="button">Join Existing Match</a>
-		<a href="#" id="play_round" data-role="button">Play!</a>
+		<button id="join_match" type="button" class="btn btn-primary btn-lg btn-block">Join Existing Match</button>
+		<button id="play_round" type="button" class="btn btn-primary btn-lg btn-block">Play</button>
 	@endif
-
-
 @stop

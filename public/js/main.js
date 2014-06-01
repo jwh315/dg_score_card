@@ -2,20 +2,20 @@ var match = {
 	match_id: '',
 
 	init: function() {
-		$('#start_match').click(match.startMatch);
-		$('#join_match').click(match.showExistingMatches);
-		$('.go-home').click(match.goHome);
+		$('#start_match').bind('click touchstart', match.startMatch);
+		$('#join_match').bind('click touchstart', match.showExistingMatches);
+		$('.go-home').bind('click touchstart', match.goHome);
+		$('.mark-match-complete').bind('click touchstart', match.finishMatch);
 	},
 
 	startMatch: function() {
+		console.log(base_url);
 		$.ajax({
-			url: 'start-match/',
+			url: 'start-match',
 			dataType: 'json',
-			type: 'post',
 			success: function(data) {
 				document.getElementById('content').innerHTML = data.html;
-				refreshLayout();
-				$('.course').click(match.registerCourse);
+				$('.course').bind('click touchstart', match.registerCourse);
 			}
 		});
 	},
@@ -27,26 +27,37 @@ var match = {
 			dataType: 'json',
 			success: function(data) {
 				document.getElementById('content').innerHTML = data.html;
-				refreshLayout();
+				$('.active-match-name').text(data.active_match);
 			}
 		});
 	},
 
 	showExistingMatches: function() {
 		$.ajax({
-			url: 'show-existing/',
+			url: 'show-existing',
 			dataType: 'json',
 			success: function(data) {
 				document.getElementById('content').innerHTML = data.html;
-				refreshLayout();
-				$('.existing-matches').click(match.joinMatch);
+				$('.existing-matches').bind('click touchstart', match.joinMatch);
 			}
 		});
 	},
 
 	joinMatch: function() {
-
+		var id = $(this).attr('id');
+		$.ajax({
+			url: 'join-match/' + id,
+			dataType: 'json',
+			success: function(data) {
+				document.getElementById('content').innerHTML = data.html;
+				$('.active-match-name').text(data.active_match);
+			}
+		});
 	},
+
+	finishMatch: function() {
+
+	}
 }
 
 var scorecard = {
@@ -58,7 +69,9 @@ var player = {
 }
 
 function refreshLayout() {
-	$("div[data-role=page]").page("destroy").page();
+	//$("div[data-role=page]").page("destroy").page();
 }
 
-match.init();
+$(document).ready(function(){
+	match.init();
+})

@@ -1,13 +1,6 @@
-<div class="ui-grid-b">
-	<div class="ui-block-a"></div>
-	<div class="ui-block-b hole-number"><h4>Pick a Course</h4></div>
-	<div class="ui-block-c"></div>
-</div>
+<h4 class="text-center">Pick a Course</h4>
 
-<ul data-role="listview" data-inset="true">
-	@foreach($courses as $course)
-		<li>
-			<a class="course" id="{{{$course->id}}}" href="#">{{{$course->course_name}}}</a>
-		</li>
-	@endforeach
-</ul>
+@foreach($courses as $course)
+	<button type="button" id="{{{$course->id}}}" class="btn btn-primary btn-lg btn-block course">{{{$course->course_name}}}</button>
+@endforeach
+

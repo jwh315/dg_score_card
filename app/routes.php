@@ -27,7 +27,8 @@ Route::get('start-match/', function()
 	return Response::json($json);
 });
 
-Route::get('register-match/{id}', function($id) {
+Route::get('register-match/{id}', function($id)
+{
 	$match = new Match;
 	$match->match_name = substr(md5(microtime()), 0, 5);
 	$match->course_id = $id;
@@ -35,14 +36,25 @@ Route::get('register-match/{id}', function($id) {
 	$match->save();
 
 	$insertID = $match->id;
-	Session::put('current_match', $insertID . '-' . $match->match_name);
-
+	Session::put('current_match', $match->match_name);
 	$json = array();
 	$json['html'] = View::make('scorecard.score')->render();
+	$json['active_match'] = Session::get('current_match');
 	return Response::json($json);
 });
 
-Route::get('show-existing/', function() {
+Route::get('join-match/{id}', function($id)
+{
+	$match = Match::find($id);
+	Session::put('current_match', $match->match_name);
+	$json = array();
+	$json['html'] = View::make('scorecard.score')->render();
+	$json['active_match'] = Session::get('current_match');
+	return Response::json($json);
+});
+
+Route::get('show-existing/', function()
+{
 	$matches = Match::where('complete', 0)->orderBy('id', 'DESC')->get();
 	$json = array();
 	$json['html'] = View::make('scorecard.existing-matches')
