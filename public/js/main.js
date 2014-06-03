@@ -28,6 +28,7 @@ var match = {
 			success: function(data) {
 				document.getElementById('content').innerHTML = data.html;
 				$('.active-match-name').text(data.active_match);
+				match.bindPlayerEvents();
 			}
 		});
 	},
@@ -51,11 +52,31 @@ var match = {
 			success: function(data) {
 				document.getElementById('content').innerHTML = data.html;
 				$('.active-match-name').text(data.active_match);
+				match.bindPlayerEvents();
 			}
 		});
 	},
 
 	finishMatch: function() {
+
+	},
+
+	bindPlayerEvents: function() {
+		$('.home').bind('click touchstart', match.goHome);
+		$('.play').bind('click touchstart', match.play);
+	},
+
+	play: function() {
+		$.ajax({
+			url: 'play',
+			dataType: 'json',
+			success: function(data) {
+				document.getElementById('content').innerHTML = data.html;
+			}
+		});
+	},
+
+	goHome: function() {
 
 	}
 }
@@ -68,10 +89,17 @@ var player = {
 
 }
 
-function refreshLayout() {
-	//$("div[data-role=page]").page("destroy").page();
+function home() {
+	$.ajax({
+		url: 'home',
+		dataType: 'json',
+		success: function(data) {
+			document.getElementById('content').innerHTML = data.html;
+			match.init();
+		}
+	});
 }
 
 $(document).ready(function(){
 	match.init();
-})
+});

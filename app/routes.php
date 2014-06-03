@@ -18,6 +18,11 @@ Route::get('/', function()
 	return View::make('scorecard.home')->with('activeMatches', $activeMatches);
 });
 
+Route::get('home/', function() {
+	$activeMatches = Match::where('complete', 0)->count();
+	return Response::json(array('html' => View::make('scorecard.home')->with('activeMatches', $activeMatches)->render()));
+});
+
 Route::get('start-match/', function()
 {
 	$courses = Course::all();
@@ -38,7 +43,7 @@ Route::get('register-match/{id}', function($id)
 	$insertID = $match->id;
 	Session::put('current_match', $match->match_name);
 	$json = array();
-	$json['html'] = View::make('scorecard.score')->render();
+	$json['html'] = View::make('scorecard.player')->render();
 	$json['active_match'] = Session::get('current_match');
 	return Response::json($json);
 });
@@ -48,7 +53,7 @@ Route::get('join-match/{id}', function($id)
 	$match = Match::find($id);
 	Session::put('current_match', $match->match_name);
 	$json = array();
-	$json['html'] = View::make('scorecard.score')->render();
+	$json['html'] = View::make('scorecard.player')->render();
 	$json['active_match'] = Session::get('current_match');
 	return Response::json($json);
 });
@@ -60,6 +65,12 @@ Route::get('show-existing/', function()
 	$json['html'] = View::make('scorecard.existing-matches')
 					->with('matches', $matches)
 					->render();
+	return Response::json($json);
+});
+
+Route::get('play/', function() {
+	$json = array();
+	$json['html'] = View::make('scorecard.score')->render();
 	return Response::json($json);
 });
 

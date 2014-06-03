@@ -1,75 +1,76 @@
 <div class="container-fluid">
 	<div class="row-fluid">
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-primary btn-lg btn-block">
+			<button type="button" class="btn btn-primary btn-md btn-block">
 				<span class="glyphicon glyphicon-chevron-left"></span>
 			</button>
 		</div>
-		<div class="col-xs-4"><h3 class="text-center">Hole 1</h3></div>
+		<div class="col-xs-4"><h4 class="text-center">Hole 1</h4></div>
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-primary btn-lg btn-block">
+			<button type="button" class="btn btn-primary btn-md btn-block">
 				<span class="glyphicon glyphicon-chevron-right"></span>
 			</button>
 		</div>
 	</div>
 </div>
+<hr>
 
-<!-- <div class="ui-grid-a player-grid">
-	<div class="ui-block-a player-name-grid">
-		<span class="player-name">Jacob</span>
-
-	</div>
-	<div class="ui-block-b score-button-container">
-		<a class="score-button plus" href="#" data-role="button">+</a>
-		<span class="hole-score">3</span>
-		<a class="score-button minus" href="#" data-role="button">-</a>
-	</div>
-</div>
-
-<div class="ui-grid-a player-grid">
-	<div class="ui-block-a player-name-grid">
-		<span class="player-name">Josh</span>
-	</div>
-	<div class="ui-block-b score-button-container">
-
-		<a class="score-button plus" href="#" data-role="button">+</a>
-		<span class="hole-score">3</span>
-		<a class="score-button minus" href="#" data-role="button">-</a>
+<div class="container-fluid player">
+	<div class="row-fluid">
+		<div class="col-xs-4"><h5>Jacob</h5></div>
+		<div class="col-xs-4 text-center"><h5>3</h5></div>
+		<div class="col-xs-4 text-right">
+			<button type="button" class="btn btn-primary btn-md">
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
+			<button type="button" class="btn btn-primary btn-md">
+				<span class="glyphicon glyphicon-minus"></span>
+			</button>
+		</div>
 	</div>
 </div>
 
-<div class="ui-grid-a player-grid">
-	<div class="ui-block-a player-name-grid">
-		<span class="player-name">Aaron</span>
-	</div>
-	<div class="ui-block-b score-button-container">
-
-		<a class="score-button plus" href="#" data-role="button">+</a>
-		<span class="hole-score">3</span>
-		<a class="score-button minus" href="#" data-role="button">-</a>
-	</div>
-</div>
-
-<div class="ui-grid-a player-grid">
-	<div class="ui-block-a player-name-grid">
-		<span class="player-name">Cam</span>
-	</div>
-	<div class="ui-block-b score-button-container">
-
-		<a class="score-button plus" href="#" data-role="button">+</a>
-		<span class="hole-score">3</span>
-		<a class="score-button minus" href="#" data-role="button">-</a>
+<div class="container-fluid player">
+	<div class="row-fluid">
+		<div class="col-xs-4"><h5>Josh</h5></div>
+		<div class="col-xs-4 text-center"><h5>3</h5></div>
+		<div class="col-xs-4 text-right">
+			<button type="button" class="btn btn-primary btn-md">
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
+			<button type="button" class="btn btn-primary btn-md">
+				<span class="glyphicon glyphicon-minus"></span>
+			</button>
+		</div>
 	</div>
 </div>
 
-<div class="ui-grid-a player-grid">
-	<div class="ui-block-a player-name-grid">
-		<span class="player-name">Johnny</span>
+<div class="container-fluid player">
+	<div class="row-fluid">
+		<div class="col-xs-4"><h5>Cam</h5></div>
+		<div class="col-xs-4 text-center"><h5>3</h5></div>
+		<div class="col-xs-4 text-right">
+			<button type="button" class="btn btn-primary btn-md">
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
+			<button type="button" class="btn btn-primary btn-md">
+				<span class="glyphicon glyphicon-minus"></span>
+			</button>
+		</div>
 	</div>
-	<div class="ui-block-b score-button-container">
+</div>
 
-		<a class="score-button plus" href="#" data-role="button">+</a>
-		<span class="hole-score">3</span>
-		<a class="score-button minus" href="#" data-role="button">-</a>
+<div class="container-fluid player">
+	<div class="row-fluid">
+		<div class="col-xs-4"><h5>Aaron</h5></div>
+		<div class="col-xs-4 text-center"><h5>3</h5></div>
+		<div class="col-xs-4 text-right">
+			<button type="button" class="btn btn-primary btn-md">
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
+			<button type="button" class="btn btn-primary btn-md">
+				<span class="glyphicon glyphicon-minus"></span>
+			</button>
+		</div>
 	</div>
-</div> -->
+</div>
