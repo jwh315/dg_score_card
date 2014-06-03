@@ -1,13 +1,13 @@
 <div class="container-fluid">
 	<div class="row-fluid">
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-primary btn-md btn-block">
+			<button type="button" class="btn btn-default btn-md btn-block">
 				<span class="glyphicon glyphicon-chevron-left"></span>
 			</button>
 		</div>
 		<div class="col-xs-4"><h4 class="text-center">Hole 1</h4></div>
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-primary btn-md btn-block">
+			<button type="button" class="btn btn-default btn-md btn-block">
 				<span class="glyphicon glyphicon-chevron-right"></span>
 			</button>
 		</div>
