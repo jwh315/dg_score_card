@@ -20,7 +20,7 @@ Route::get('/', function()
 
 Route::get('home/', function() {
 	$activeMatches = Match::where('complete', 0)->count();
-	return Response::json(array('html' => View::make('scorecard.home')->with('activeMatches', $activeMatches)->render()));
+	return Response::json(array('html' => View::make('scorecard.home-buttons')->with('activeMatches', $activeMatches)->render()));
 });
 
 Route::get('start-match/', function()
