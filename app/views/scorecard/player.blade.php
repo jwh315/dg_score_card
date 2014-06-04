@@ -28,3 +28,7 @@
 		</div>
 	</div>
 </div>
+
+@foreach($players as $player)
+	<p>{{$player->player_name}}</p>
+@endforeach

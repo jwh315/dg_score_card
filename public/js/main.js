@@ -2,10 +2,10 @@ var match = {
 	match_id: '',
 
 	init: function() {
-		$('#start_match').bind('click touchstart', match.startMatch);
-		$('#join_match').bind('click touchstart', match.showExistingMatches);
-		$('.go-home').bind('click touchstart', match.goHome);
-		$('.mark-match-complete').bind('click touchstart', match.finishMatch);
+		$('#start_match').bind('click', match.startMatch);
+		$('#join_match').bind('click', match.showExistingMatches);
+		$('.go-home').bind('click', match.goHome);
+		$('.mark-match-complete').bind('click', match.finishMatch);
 	},
 
 	startMatch: function() {
@@ -15,7 +15,7 @@ var match = {
 			dataType: 'json',
 			success: function(data) {
 				document.getElementById('content').innerHTML = data.html;
-				$('.course').bind('click touchstart', match.registerCourse);
+				$('.course').bind('click', match.registerCourse);
 			}
 		});
 	},
@@ -39,7 +39,7 @@ var match = {
 			dataType: 'json',
 			success: function(data) {
 				document.getElementById('content').innerHTML = data.html;
-				$('.existing-matches').bind('click touchstart', match.joinMatch);
+				$('.existing-matches').bind('click', match.joinMatch);
 			}
 		});
 	},
@@ -62,8 +62,9 @@ var match = {
 	},
 
 	bindPlayerEvents: function() {
-		$('.home').bind('click touchstart', match.goHome);
-		$('.play').bind('click touchstart', match.play);
+		$('.home').bind('click', match.goHome);
+		$('.play').bind('click', match.play);
+		$('#register-player').bind('click', player.register);
 	},
 
 	play: function() {
@@ -87,6 +88,19 @@ var scorecard = {
 
 var player = {
 
+	register: function() {
+		event.preventDefault();
+		var playerName = document.getElementById('register-player-name');
+		if (playerName.value) {
+			$.ajax({
+				url: 'register-player/' + playerName.value,
+				dataType: 'json',
+				success: function(data) {
+					console.log(data);
+				}
+			});
+		}
+	},
 }
 
 function home() {

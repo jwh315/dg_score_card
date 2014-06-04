@@ -41,8 +41,9 @@ Route::get('register-match/{id}', function($id)
 
 	$insertID = $match->id;
 	Session::put('current_match', $match->match_name);
+	$players = Player::all();
 	$json = array();
-	$json['html'] = View::make('scorecard.player')->render();
+	$json['html'] = View::make('scorecard.player')->with('players', $players)->render();
 	$json['active_match'] = Session::get('current_match');
 	return Response::json($json);
 });
@@ -51,8 +52,10 @@ Route::get('join-match/{id}', function($id)
 {
 	$match = Match::find($id);
 	Session::put('current_match', $match->match_name);
+
+	$players = Player::all();
 	$json = array();
-	$json['html'] = View::make('scorecard.player')->render();
+	$json['html'] = View::make('scorecard.player')->with('players', $players)->render();
 	$json['active_match'] = Session::get('current_match');
 	return Response::json($json);
 });
@@ -70,6 +73,17 @@ Route::get('show-existing/', function()
 Route::get('play/', function() {
 	$json = array();
 	$json['html'] = View::make('scorecard.score')->render();
+	return Response::json($json);
+});
+
+Route::get('register-player/{name}', function($name){
+	$player = new Player;
+	$player->player_name = $name;
+	$player->handicap = 0;
+	$player->save();
+
+	$json = array();
+	$json['player_id'] = $player->id;
 	return Response::json($json);
 });
 
