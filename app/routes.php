@@ -13,7 +13,6 @@
 
 Route::get('/', function()
 {
-	//return Response::json(array('html' => View::make('scorecard.home')->render()));
 	$activeMatches = Match::where('complete', 0)->count();
 	return View::make('scorecard.home')->with('activeMatches', $activeMatches);
 });
