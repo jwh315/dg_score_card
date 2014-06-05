@@ -96,7 +96,15 @@ var player = {
 				url: 'register-player/' + playerName.value,
 				dataType: 'json',
 				success: function(data) {
-					console.log(data);
+					if (data.player_id) {
+						var newPlayerDiv = document.querySelectorAll('.player')[0].cloneNode(true);
+
+						newPlayerDiv.querySelectorAll('.player-name')[0].innerHTML = playerName.value;
+						newPlayerDiv.querySelectorAll('.player-id')[0].value = data.player_id;
+
+						document.getElementById('registered-players').appendChild(newPlayerDiv);
+						playerName.value = '';
+					}
 				}
 			});
 		}
