@@ -26,6 +26,7 @@ body {
 
 .player {
 	margin-bottom: .5em;
+	text-transform: capitalize;
 }
 
 .player:nth-child(4n+1) {

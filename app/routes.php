@@ -53,7 +53,7 @@ Route::get('join-match/{id}', function($id)
 	$match = Match::find($id);
 	Session::put('current_match', $match->match_name);
 
-	$players = Player::all();
+	$players = Player::orderBy('player_name', 'ASC')->get();
 	$json = array();
 	$json['html'] = View::make('scorecard.player')->with('players', $players)->render();
 	$json['active_match'] = Session::get('current_match');
@@ -78,7 +78,7 @@ Route::get('play/', function() {
 
 Route::get('register-player/{name}', function($name){
 	$player = new Player;
-	$player->player_name = $name;
+	$player->player_name = strtolower($name);
 	$player->handicap = 0;
 	$player->save();
 

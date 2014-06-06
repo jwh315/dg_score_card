@@ -32,6 +32,19 @@
 <hr>
 
 <div id="registered-players">
+	<div class="container-fluid player" style="display: none;">
+		<div class="row-fluid">
+			<div class="col-xs-8">
+				<h4 class="player-name"></h4>
+			</div>
+			<div class="col-xs-4 ">
+				<button type="button" class="btn btn-primary btn-lg btn-block select-player">
+					<span class="glyphicon glyphicon-plus"></span>
+				</button>
+			</div>
+		</div>
+		<input type="hidden" class="player-id" value="">
+	</div>
 	@foreach($players as $player)
 		<div class="container-fluid player">
 			<div class="row-fluid">
@@ -39,7 +52,7 @@
 					<h4 class="player-name">{{$player->player_name}}</h4>
 				</div>
 				<div class="col-xs-4 ">
-					<button id="register-player" type="button" class="btn btn-primary btn-lg btn-block">
+					<button type="button" class="btn btn-primary btn-lg btn-block select-player">
 						<span class="glyphicon glyphicon-plus"></span>
 					</button>
 				</div>
