@@ -44,3 +44,7 @@ body {
 .player:nth-child(4n+4) {
 	background: #C7DAD4;
 }
+
+.spacer {
+	margin-top: 15px;
+}

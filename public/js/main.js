@@ -1,11 +1,62 @@
-var match = {
+/**
+*
+* functions that are either global to the app or js helper functions
+*
+**/
+var App = {
+	home: function() {
+		$.ajax({
+			url: 'home',
+			dataType: 'json',
+			success: function(data) {
+				App.setContent(data.html);
+				Match.init();
+			}
+		});
+	},
+
+	hasClass: function (elem, className) {
+	    return new RegExp(' ' + className + ' ').test(' ' + elem.className + ' ');
+	},
+
+	addClass: function (elem, className) {
+	    if (!App.hasClass(elem, className)) {
+	        elem.className += ' ' + className;
+	    }
+	},
+
+	removeClass: function (elem, className) {
+	    var newClass = ' ' + elem.className.replace( /[\t\r\n]/g, ' ') + ' ';
+	    if (App.hasClass(elem, className)) {
+	        while (newClass.indexOf(' ' + className + ' ') >= 0 ) {
+	            newClass = newClass.replace(' ' + className + ' ', ' ');
+	        }
+	        elem.className = newClass.replace(/^\s+|\s+$/g, '');
+	    }
+	},
+
+	setContent: function(html) {
+		document.getElementById('content').innerHTML = html;
+	},
+
+	setClickEvent: function(elem, func) {
+		elem.addEventListener('click', func);
+	}
+}
+
+/**
+*
+* match obj will handle most of the splash screen events
+* and match setup functionality
+*
+**/
+var Match = {
 	match_id: '',
 
 	init: function() {
-		$('#start_match').bind('click', match.startMatch);
-		$('#join_match').bind('click', match.showExistingMatches);
-		$('.go-home').bind('click', match.goHome);
-		$('.mark-match-complete').bind('click', match.finishMatch);
+		App.setClickEvent(document.getElementById('start_match'), Match.startMatch);
+		App.setClickEvent(document.getElementById('join_match'), Match.showExistingMatches);
+		App.setClickEvent(document.querySelectorAll('.mark-match-complete')[0], Match.finishMatch);
 	},
 
 	startMatch: function() {
@@ -14,8 +65,8 @@ var match = {
 			url: 'start-match',
 			dataType: 'json',
 			success: function(data) {
-				document.getElementById('content').innerHTML = data.html;
-				$('.course').bind('click', match.registerCourse);
+				App.setContent(data.html);
+				$('.course').bind('click', Match.registerCourse);
 			}
 		});
 	},
@@ -26,9 +77,9 @@ var match = {
 			url: 'register-match/' + id,
 			dataType: 'json',
 			success: function(data) {
-				document.getElementById('content').innerHTML = data.html;
-				$('.active-match-name').text(data.active_match);
-				match.bindPlayerEvents();
+				App.setContent(data.html);
+				document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
+				Match.bindPlayerEvents();
 			}
 		});
 	},
@@ -38,8 +89,8 @@ var match = {
 			url: 'show-existing',
 			dataType: 'json',
 			success: function(data) {
-				document.getElementById('content').innerHTML = data.html;
-				$('.existing-matches').bind('click', match.joinMatch);
+				App.setContent(data.html);
+				$('.existing-matches').bind('click', Match.joinMatch);
 			}
 		});
 	},
@@ -50,9 +101,9 @@ var match = {
 			url: 'join-match/' + id,
 			dataType: 'json',
 			success: function(data) {
-				document.getElementById('content').innerHTML = data.html;
-				$('.active-match-name').text(data.active_match);
-				match.bindPlayerEvents();
+				App.setContent(data.html);
+				document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
+				Match.bindPlayerEvents();
 			}
 		});
 	},
@@ -62,8 +113,8 @@ var match = {
 	},
 
 	bindPlayerEvents: function() {
-		$('.home').bind('click', match.goHome);
-		$('.play').bind('click', match.play);
+		$('.home').bind('click', Match.goHome);
+		$('.play').bind('click', Match.play);
 		$('#register-player').bind('click', Player.register);
 		$('.select-player').bind('click', Player.selectPlayer);
 	},
@@ -73,7 +124,7 @@ var match = {
 			url: 'play',
 			dataType: 'json',
 			success: function(data) {
-				document.getElementById('content').innerHTML = data.html;
+				App.setContent(data.html);
 			}
 		});
 	},
@@ -83,10 +134,11 @@ var match = {
 	}
 }
 
-var scorecard = [
-
-]
-
+/**
+*
+* Player obj will contain all pertant player info (name, id, scores)
+*
+**/
 function Player(name, id) {
 	this.name = name;
 	this.id = id;
@@ -114,24 +166,30 @@ Player.register = function() {
 }
 
 Player.selectPlayer = function() {
-	var parentDiv = this.parentNode.parentNode.parentNode;
+	var parentDiv = this.parentNode.parentNode;
 	var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
 	var playerName = parentDiv.querySelectorAll('.player-name')[0].innerHTML;
-
+	var button = parentDiv.querySelectorAll('.glyphicon-plus')[0];
+	App.removeClass(button, 'glyphicon-plus');
+	App.addClass(button, 'glyphicon-minus');
 	scorecard.push(new Player(playerName, playerId));
 }
 
-function home() {
-	$.ajax({
-		url: 'home',
-		dataType: 'json',
-		success: function(data) {
-			document.getElementById('content').innerHTML = data.html;
-			match.init();
-		}
+Player.removePlayer = function() {
+	scorecard.forEach(function(player) {
+		console.log(player.id);
 	});
 }
 
+/**
+*
+* array to hold player objects
+*
+**/
+var scorecard = [
+
+]
+
 $(document).ready(function(){
-	match.init();
+	Match.init();
 });

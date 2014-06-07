@@ -1,7 +1,7 @@
 <div class="container-fluid">
 	<div class="row-fluid">
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-default btn-md btn-block" onclick="home();">
+			<button type="button" class="btn btn-default btn-md btn-block" onclick="App.home();">
 				<span class="glyphicon glyphicon-home"></span>
 			</button>
 		</div>
@@ -31,33 +31,33 @@
 
 <hr>
 
-<div id="registered-players">
-	<div class="container-fluid player" style="display: none;">
-		<div class="row-fluid">
+<div class="container"  id="registered-players">
+
+	<div class="row player" style="display: none;">
+		<div class="col-xs-8">
+			<h4 class="player-name"></h4>
+		</div>
+		<div class="col-xs-4 ">
+			<button type="button" class="btn btn-primary btn-lg btn-block select-player">
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
+		</div>
+		<input type="hidden" class="player-id" value="">
+	</div>
+
+	@foreach($players as $player)
+
+		<div class="row player">
 			<div class="col-xs-8">
-				<h4 class="player-name"></h4>
+				<h4 class="player-name">{{$player->player_name}}</h4>
 			</div>
 			<div class="col-xs-4 ">
 				<button type="button" class="btn btn-primary btn-lg btn-block select-player">
 					<span class="glyphicon glyphicon-plus"></span>
 				</button>
 			</div>
-		</div>
-		<input type="hidden" class="player-id" value="">
-	</div>
-	@foreach($players as $player)
-		<div class="container-fluid player">
-			<div class="row-fluid">
-				<div class="col-xs-8">
-					<h4 class="player-name">{{$player->player_name}}</h4>
-				</div>
-				<div class="col-xs-4 ">
-					<button type="button" class="btn btn-primary btn-lg btn-block select-player">
-						<span class="glyphicon glyphicon-plus"></span>
-					</button>
-				</div>
-			</div>
 			<input type="hidden" class="player-id" value="{{$player->id}}">
 		</div>
+
 	@endforeach
 </div>

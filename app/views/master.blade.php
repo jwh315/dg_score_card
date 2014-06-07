@@ -18,7 +18,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="#" onclick="home();" class="navbar-brand">PVDGC Score Card</a>
+            <a href="#" onclick="App.home();" class="navbar-brand">PVDGC Score Card</a>
         </div>
 
         <div class="collapse navbar-collapse navbar-responsive-collapse">
