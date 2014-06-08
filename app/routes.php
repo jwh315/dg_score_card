@@ -48,7 +48,7 @@ Route::get('register-match/{id}', function($id)
 	return Response::json($json);
 });
 
-Route::get('join-match/{id}', function($id)
+Route::any('join-match/{id}', function($id)
 {
 	$match = Match::find($id);
 	Session::put('current_match', $match->match_name);

@@ -39,8 +39,10 @@ var App = {
 		document.getElementById('content').innerHTML = html;
 	},
 
-	setClickEvent: function(elem, func) {
-		elem.addEventListener('click', func);
+	bindEvent: function(type, identifier, func) {
+		[].forEach.call(document.querySelectorAll(identifier), function(el){
+			el.addEventListener(type, func);
+		});
 	}
 }
 
@@ -54,13 +56,12 @@ var Match = {
 	match_id: '',
 
 	init: function() {
-		App.setClickEvent(document.getElementById('start_match'), Match.startMatch);
-		App.setClickEvent(document.getElementById('join_match'), Match.showExistingMatches);
-		App.setClickEvent(document.querySelectorAll('.mark-match-complete')[0], Match.finishMatch);
+		App.bindEvent('click', '#start_match', Match.startMatch);
+		App.bindEvent('click', '#join_match', Match.showExistingMatches);
+		App.bindEvent('click', '.mark-match-complete', Match.finishMatch);
 	},
 
 	startMatch: function() {
-		console.log(base_url);
 		$.ajax({
 			url: 'start-match',
 			dataType: 'json',
@@ -113,10 +114,10 @@ var Match = {
 	},
 
 	bindPlayerEvents: function() {
-		$('.home').bind('click', Match.goHome);
-		$('.play').bind('click', Match.play);
-		$('#register-player').bind('click', Player.register);
-		$('.select-player').bind('click', Player.selectPlayer);
+		App.bindEvent('click', '.home', Match.goHome);
+		App.bindEvent('click', '.play', Match.play);
+		App.bindEvent('click', '#register-player', Player.register);
+		App.bindEvent('click', '.select-player', Player.selectPlayer);
 	},
 
 	play: function() {
@@ -156,7 +157,10 @@ Player.register = function() {
 
 					newPlayerDiv.querySelectorAll('.player-name')[0].innerHTML = playerName.value;
 					newPlayerDiv.querySelectorAll('.player-id')[0].value = data.player_id;
-					newPlayerDiv.style.display = 'table';
+					newPlayerDiv.querySelectorAll('.select-player')[0].addEventListener('click', Player.selectPlayer);
+
+					newPlayerDiv.style.display = 'block';
+
 					document.getElementById('registered-players').appendChild(newPlayerDiv);
 					playerName.value = '';
 				}
@@ -169,16 +173,41 @@ Player.selectPlayer = function() {
 	var parentDiv = this.parentNode.parentNode;
 	var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
 	var playerName = parentDiv.querySelectorAll('.player-name')[0].innerHTML;
-	var button = parentDiv.querySelectorAll('.glyphicon-plus')[0];
-	App.removeClass(button, 'glyphicon-plus');
-	App.addClass(button, 'glyphicon-minus');
+	var buttonIcon = parentDiv.querySelectorAll('.glyphicon-plus')[0];
+	var button = parentDiv.querySelectorAll('.select-player')[0];
+
+	button.removeEventListener('click', Player.selectPlayer);
+	button.addEventListener('click', Player.removePlayer);
+
+	App.removeClass(buttonIcon, 'glyphicon-plus');
+	App.addClass(buttonIcon, 'glyphicon-minus');
+
+	App.removeClass(button, 'select-player');
+	App.addClass(button, 'deselect-player');
+
 	scorecard.push(new Player(playerName, playerId));
 }
 
 Player.removePlayer = function() {
-	scorecard.forEach(function(player) {
-		console.log(player.id);
-	});
+	var parentDiv = this.parentNode.parentNode;
+	var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
+	var buttonIcon = parentDiv.querySelectorAll('.glyphicon-minus')[0];
+	var button = parentDiv.querySelectorAll('.deselect-player')[0];
+
+	button.removeEventListener('click', Player.removePlayer);
+	button.addEventListener('click', Player.selectPlayer);
+
+	App.removeClass(buttonIcon, 'glyphicon-minus');
+	App.addClass(buttonIcon, 'glyphicon-plus');
+
+	App.removeClass(button, 'deselect-player');
+	App.addClass(button, 'select-player');
+
+	for (var i = 0; i < scorecard.length; i++) {
+		if (scorecard[i].id === playerId) {
+			scorecard.splice(i, 1);
+		}
+	};
 }
 
 /**
