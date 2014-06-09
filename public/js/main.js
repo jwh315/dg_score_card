@@ -5,13 +5,9 @@
 **/
 var App = {
 	home: function() {
-		$.ajax({
-			url: 'home',
-			dataType: 'json',
-			success: function(data) {
-				App.setContent(data.html);
-				Match.init();
-			}
+		App.ajax('home', 'GET', null, function(data){
+			App.setContent(data.html);
+			Match.init();
 		});
 	},
 
@@ -43,6 +39,18 @@ var App = {
 		[].forEach.call(document.querySelectorAll(identifier), function(el){
 			el.addEventListener(type, func);
 		});
+	},
+
+	ajax: function(url, type, data, func) {
+		var httpRequest = new XMLHttpRequest();
+		httpRequest.onreadystatechange = function(data) {
+			if (httpRequest.readyState == 4) {
+				var response = JSON.parse(data.srcElement.responseText);
+				func(response);
+			}
+		};
+		httpRequest.open('GET', url);
+		httpRequest.send();
 	}
 }
 
@@ -62,50 +70,36 @@ var Match = {
 	},
 
 	startMatch: function() {
-		$.ajax({
-			url: 'start-match',
-			dataType: 'json',
-			success: function(data) {
-				App.setContent(data.html);
-				$('.course').bind('click', Match.registerCourse);
-			}
+		App.ajax('start-match', 'GET', null, function(data) {
+			App.setContent(data.html);
+			App.bindEvent('click', '.course', Match.registerCourse);
 		});
 	},
 
 	registerCourse: function() {
-		var id = $(this).attr('id');
-		$.ajax({
-			url: 'register-match/' + id,
-			dataType: 'json',
-			success: function(data) {
-				App.setContent(data.html);
-				document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
-				Match.bindPlayerEvents();
-			}
+		var id = this.id;
+		var url = 'register-match/' + id;
+		App.ajax(url, 'GET', null, function(data) {
+			App.setContent(data.html);
+			// sdocument.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
+			Match.bindPlayerEvents();
 		});
 	},
 
 	showExistingMatches: function() {
-		$.ajax({
-			url: 'show-existing',
-			dataType: 'json',
-			success: function(data) {
-				App.setContent(data.html);
-				$('.existing-matches').bind('click', Match.joinMatch);
-			}
+		App.ajax('show-existing', 'GET', null, function(data) {
+			App.setContent(data.html);
+			App.bindEvent('click', '.existing-matches', Match.joinMatch);
 		});
 	},
 
 	joinMatch: function() {
-		var id = $(this).attr('id');
-		$.ajax({
-			url: 'join-match/' + id,
-			dataType: 'json',
-			success: function(data) {
-				App.setContent(data.html);
-				document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
-				Match.bindPlayerEvents();
-			}
+		var id = this.id;
+		var url = 'join-match/' + id;
+		App.ajax(url, 'GET', null, function(data) {
+			App.setContent(data.html);
+			// document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
+			Match.bindPlayerEvents();
 		});
 	},
 
@@ -121,18 +115,10 @@ var Match = {
 	},
 
 	play: function() {
-		$.ajax({
-			url: 'play',
-			dataType: 'json',
-			success: function(data) {
-				App.setContent(data.html);
-			}
+		App.ajax('play', 'GET', null, function(data) {
+			App.setContent(data.html);
 		});
 	},
-
-	goHome: function() {
-
-	}
 }
 
 /**
@@ -147,26 +133,21 @@ function Player(name, id) {
 
 Player.register = function() {
 	var playerName = document.getElementById('register-player-name');
-	if (playerName.value) {
-		$.ajax({
-			url: 'register-player/' + playerName.value,
-			dataType: 'json',
-			success: function(data) {
-				if (data.player_id) {
-					var newPlayerDiv = document.querySelectorAll('.player')[0].cloneNode(true);
+	var url = 'register-player/' + playerName;
+	App.ajax(url, 'GET', null, function(data) {
+		if (data.player_id) {
+			var newPlayerDiv = document.querySelectorAll('.player')[0].cloneNode(true);
 
-					newPlayerDiv.querySelectorAll('.player-name')[0].innerHTML = playerName.value;
-					newPlayerDiv.querySelectorAll('.player-id')[0].value = data.player_id;
-					newPlayerDiv.querySelectorAll('.select-player')[0].addEventListener('click', Player.selectPlayer);
+			newPlayerDiv.querySelectorAll('.player-name')[0].innerHTML = playerName.value;
+			newPlayerDiv.querySelectorAll('.player-id')[0].value = data.player_id;
+			newPlayerDiv.querySelectorAll('.select-player')[0].addEventListener('click', Player.selectPlayer);
 
-					newPlayerDiv.style.display = 'block';
+			newPlayerDiv.style.display = 'block';
 
-					document.getElementById('registered-players').appendChild(newPlayerDiv);
-					playerName.value = '';
-				}
-			}
-		});
-	}
+			document.getElementById('registered-players').appendChild(newPlayerDiv);
+			playerName.value = '';
+		}
+	});
 }
 
 Player.selectPlayer = function() {
@@ -219,6 +200,4 @@ var scorecard = [
 
 ]
 
-$(document).ready(function(){
-	Match.init();
-});
+Match.init();

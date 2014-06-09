@@ -11,18 +11,18 @@
 |
 */
 
-Route::get('/', function()
+Route::any('/', function()
 {
 	$activeMatches = Match::where('complete', 0)->count();
 	return View::make('scorecard.home')->with('activeMatches', $activeMatches);
 });
 
-Route::get('home/', function() {
+Route::any('home/', function() {
 	$activeMatches = Match::where('complete', 0)->count();
 	return Response::json(array('html' => View::make('scorecard.home-buttons')->with('activeMatches', $activeMatches)->render()));
 });
 
-Route::get('start-match/', function()
+Route::any('start-match/', function()
 {
 	$courses = Course::all();
 	$json = array();
@@ -31,7 +31,7 @@ Route::get('start-match/', function()
 	return Response::json($json);
 });
 
-Route::get('register-match/{id}', function($id)
+Route::any('register-match/{id}', function($id)
 {
 	$match = new Match;
 	$match->match_name = substr(md5(microtime()), 0, 5);
@@ -60,7 +60,7 @@ Route::any('join-match/{id}', function($id)
 	return Response::json($json);
 });
 
-Route::get('show-existing/', function()
+Route::any('show-existing/', function()
 {
 	$matches = Match::where('complete', 0)->orderBy('id', 'DESC')->get();
 	$json = array();
@@ -70,13 +70,13 @@ Route::get('show-existing/', function()
 	return Response::json($json);
 });
 
-Route::get('play/', function() {
+Route::any('play/', function() {
 	$json = array();
 	$json['html'] = View::make('scorecard.score')->render();
 	return Response::json($json);
 });
 
-Route::get('register-player/{name}', function($name){
+Route::any('register-player/{name}', function($name){
 	$player = new Player;
 	$player->player_name = strtolower($name);
 	$player->handicap = 0;
