@@ -1,3 +1,5 @@
+/*global App, document, Match, Player, XMLHttpRequest*/
+'use strict';
 /**
 *
 * functions that are either global to the app or js helper functions
@@ -44,7 +46,7 @@ var App = {
 	ajax: function(url, type, data, func) {
 		var httpRequest = new XMLHttpRequest();
 		httpRequest.onreadystatechange = function(data) {
-			if (httpRequest.readyState == 4) {
+			if (httpRequest.readyState === 4) {
 				var response = JSON.parse(data.srcElement.responseText);
 				func(response);
 			}
@@ -77,11 +79,10 @@ var Match = {
 	},
 
 	registerCourse: function() {
-		var id = this.id;
-		var url = 'register-match/' + id;
+		var url = 'register-match/' + this.id;
 		App.ajax(url, 'GET', null, function(data) {
 			App.setContent(data.html);
-			// sdocument.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
+			// document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
 			Match.bindPlayerEvents();
 		});
 	},
@@ -94,8 +95,7 @@ var Match = {
 	},
 
 	joinMatch: function() {
-		var id = this.id;
-		var url = 'join-match/' + id;
+		var url = 'join-match/' + this.id;
 		App.ajax(url, 'GET', null, function(data) {
 			App.setContent(data.html);
 			// document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
@@ -133,7 +133,7 @@ function Player(name, id) {
 
 Player.register = function() {
 	var playerName = document.getElementById('register-player-name');
-	var url = 'register-player/' + playerName;
+	var url = 'register-player/' + playerName.value;
 	App.ajax(url, 'GET', null, function(data) {
 		if (data.player_id) {
 			var newPlayerDiv = document.querySelectorAll('.player')[0].cloneNode(true);
