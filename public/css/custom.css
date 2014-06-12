@@ -48,3 +48,8 @@ body {
 .spacer {
 	margin-top: 15px;
 }
+
+.hole-number {
+	margin-top: -0.5px;
+	margin-bottom: 3.5px;
+}

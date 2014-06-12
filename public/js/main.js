@@ -117,6 +117,7 @@ var Match = {
 	play: function() {
 		App.ajax('play', 'GET', null, function(data) {
 			App.setContent(data.html);
+			console.log(data.holes);
 		});
 	},
 }

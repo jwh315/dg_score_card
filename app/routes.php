@@ -71,8 +71,11 @@ Route::any('show-existing/', function()
 });
 
 Route::any('play/', function() {
+	$match = Match::where('match_name', Session::get('current_match'))->first();
+
 	$json = array();
 	$json['html'] = View::make('scorecard.score')->render();
+	$json['holes'] = Hole::where('course_id', $match->course_id)->get()->toJson();
 	return Response::json($json);
 });
 

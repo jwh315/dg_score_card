@@ -1,6 +1,6 @@
 <?php
 
-class Course extends Eloquent {
+class Hole extends Eloquent {
 
 	public $timestamps = false;
 

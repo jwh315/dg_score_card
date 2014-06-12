@@ -16,9 +16,6 @@
     <div id="content">
         @yield('content')
     </div>
-    <script>
-        var base_url = "{{url('/')}}"
-    </script>
     <script src="{{asset('js/bootstrap-without-jquery.js')}}"></script>
     <script src="{{asset('js/main.js')}}"></script>
 </body>

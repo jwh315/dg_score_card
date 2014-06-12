@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container">
 	<div class="row spacer">
 		<div class="col-xs-1"></div>
 		<div class="col-xs-10">

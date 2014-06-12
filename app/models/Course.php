@@ -8,4 +8,9 @@ class Course extends Eloquent {
 	{
 		return $this->hasMany('Hole');
 	}
+
+	public function match()
+	{
+		return $this->hasMany('Match');
+	}
 }
