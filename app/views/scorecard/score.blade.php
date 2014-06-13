@@ -6,11 +6,17 @@
 			</button>
 		</div>
 		<div class="col-xs-4">
-			<h4 class="text-center hole-number">Hole 1</h4>
-			<div class="text-center"><span>Par 3</span><span> - </span><span>320ft</span></div>
+			<h4 class="text-center hole-number"></h4>
+			<div class="text-center">
+				<span>Par</span>
+				<span class="par"></span>
+				<span> - </span>
+				<span class="distance"></span>
+				<span>ft</span>
+			</div>
 		</div>
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-default btn-md btn-block">
+			<button type="button" class="btn btn-default btn-md btn-block" onclick="Match.course.loadNextHole();">
 				<span class="glyphicon glyphicon-chevron-right"></span>
 			</button>
 		</div>

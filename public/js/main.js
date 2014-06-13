@@ -64,6 +64,7 @@ var App = {
 **/
 var Match = {
 	match_id: '',
+	course: '',
 
 	init: function() {
 		App.bindEvent('click', '#start_match', Match.startMatch);
@@ -117,9 +118,43 @@ var Match = {
 	play: function() {
 		App.ajax('play', 'GET', null, function(data) {
 			App.setContent(data.html);
-			console.log(data.holes);
+			Match.course = new Course(JSON.parse(data.holes));
+			Match.course.loadNextHole();
 		});
 	},
+}
+
+/**
+*
+* the course object will hold all course/hole data. It will be
+* responsible for iterating and displaying the current hole
+* information on the score card.
+*
+**/
+function Course(courseData) {
+	this.holes = courseData;
+	this.currentHole = 0;
+}
+
+Course.prototype.loadNextHole = function() {
+	var par = '';
+	var distance = '';
+	if (!this.currentHole) {
+		par = this.holes[0].par;
+		distance = this.holes[0].distance;
+		this.currentHole = 1;
+	} else {
+		par = this.holes[this.currentHole].par;
+		distance = this.holes[this.currentHole].distance;
+		this.currentHole += 1;
+	}
+	this.setHoleInfo(par, distance, this.currentHole);
+}
+
+Course.prototype.setHoleInfo = function(par, distance, holeNumber) {
+	document.querySelectorAll('.par')[0].innerHTML = par;
+	document.querySelectorAll('.distance')[0].innerHTML = distance;
+	document.querySelectorAll('.hole-number')[0].innerHTML = 'Hole ' + holeNumber;
 }
 
 /**
