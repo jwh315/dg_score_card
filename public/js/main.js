@@ -119,7 +119,7 @@ var Match = {
 		App.ajax('play', 'GET', null, function(data) {
 			App.setContent(data.html);
 			Match.course = new Course(JSON.parse(data.holes));
-			Match.course.loadNextHole();
+			Match.course.loadNextHole('forward');
 		});
 	},
 }
@@ -136,17 +136,29 @@ function Course(courseData) {
 	this.currentHole = 0;
 }
 
-Course.prototype.loadNextHole = function() {
+Course.prototype.loadNextHole = function(direction) {
 	var par = '';
 	var distance = '';
-	if (!this.currentHole) {
-		par = this.holes[0].par;
-		distance = this.holes[0].distance;
-		this.currentHole = 1;
-	} else {
-		par = this.holes[this.currentHole].par;
-		distance = this.holes[this.currentHole].distance;
-		this.currentHole += 1;
+	if (direction == 'forward') {
+		if(!this.currentHole || this.currentHole == this.holes.length) {
+			par = this.holes[0].par;
+			distance = this.holes[0].distance;
+			this.currentHole = 1;
+		} else {
+			par = this.holes[this.currentHole].par;
+			distance = this.holes[this.currentHole].distance;
+			this.currentHole += 1;
+		}
+	} else if (direction == 'back') {
+		if (this.currentHole === 1) {
+			this.currentHole = this.holes.length;
+			par = this.holes[this.holes.length - 1].par;
+			distance = this.holes[this.holes.length - 1].distance;
+		} else {
+			this.currentHole -= 1;
+			par = this.holes[this.currentHole - 1].par;
+			distance = this.holes[this.currentHole - 1].distance;
+		}
 	}
 	this.setHoleInfo(par, distance, this.currentHole);
 }

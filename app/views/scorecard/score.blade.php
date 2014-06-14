@@ -1,7 +1,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-default btn-md btn-block">
+			<button type="button" class="btn btn-default btn-md btn-block" onclick="Match.course.loadNextHole('back');">
 				<span class="glyphicon glyphicon-chevron-left"></span>
 			</button>
 		</div>
@@ -16,7 +16,7 @@
 			</div>
 		</div>
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-default btn-md btn-block" onclick="Match.course.loadNextHole();">
+			<button type="button" class="btn btn-default btn-md btn-block" onclick="Match.course.loadNextHole('forward');">
 				<span class="glyphicon glyphicon-chevron-right"></span>
 			</button>
 		</div>
