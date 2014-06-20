@@ -16,6 +16,24 @@
     <div id="content">
         @yield('content')
     </div>
+
+    <div class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close-modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Whoops and junk</h4>
+                </div>
+                <div class="modal-body">
+                    <p class='err-msg'></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{{asset('js/bootstrap-without-jquery.js')}}"></script>
     <script src="{{asset('js/main.js')}}"></script>
 </body>

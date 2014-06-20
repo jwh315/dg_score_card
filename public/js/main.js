@@ -53,6 +53,15 @@ var App = {
 		};
 		httpRequest.open('GET', url);
 		httpRequest.send();
+	},
+
+	closeModal: function() {
+		document.querySelectorAll('.modal')[0].style.display = "none";
+	},
+
+	displayErrorModal: function(msg) {
+		document.querySelectorAll('.err-msg')[0].innerHTML = msg;
+		document.querySelectorAll('.modal')[0].style.display = "block";
 	}
 }
 
@@ -70,6 +79,7 @@ var Match = {
 		App.bindEvent('click', '#start_match', Match.startMatch);
 		App.bindEvent('click', '#join_match', Match.showExistingMatches);
 		App.bindEvent('click', '.mark-match-complete', Match.finishMatch);
+		App.bindEvent('click', '.close-modal', App.closeModal);
 	},
 
 	startMatch: function() {
@@ -116,11 +126,15 @@ var Match = {
 	},
 
 	play: function() {
-		App.ajax('play', 'GET', null, function(data) {
-			App.setContent(data.html);
-			Match.course = new Course(JSON.parse(data.holes));
-			Match.course.loadNextHole('forward');
-		});
+		if (scorecard.length > 0) {
+			App.ajax('play', 'GET', null, function(data) {
+				App.setContent(data.html);
+				Match.course = new Course(JSON.parse(data.holes));
+				Match.course.loadNextHole('forward');
+			});
+		} else {
+			App.displayErrorModal('You really should pick at least one player!');
+		}
 	},
 }
 
@@ -200,19 +214,10 @@ Player.register = function() {
 
 Player.selectPlayer = function() {
 	var parentDiv = this.parentNode.parentNode;
-	var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
 	var playerName = parentDiv.querySelectorAll('.player-name')[0].innerHTML;
-	var buttonIcon = parentDiv.querySelectorAll('.glyphicon-plus')[0];
-	var button = parentDiv.querySelectorAll('.select-player')[0];
+	var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
 
-	button.removeEventListener('click', Player.selectPlayer);
-	button.addEventListener('click', Player.removePlayer);
-
-	App.removeClass(buttonIcon, 'glyphicon-plus');
-	App.addClass(buttonIcon, 'glyphicon-minus');
-
-	App.removeClass(button, 'select-player');
-	App.addClass(button, 'deselect-player');
+	Player.setIcon(parentDiv, 'select');
 
 	scorecard.push(new Player(playerName, playerId));
 }
@@ -220,23 +225,40 @@ Player.selectPlayer = function() {
 Player.removePlayer = function() {
 	var parentDiv = this.parentNode.parentNode;
 	var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
-	var buttonIcon = parentDiv.querySelectorAll('.glyphicon-minus')[0];
-	var button = parentDiv.querySelectorAll('.deselect-player')[0];
-
-	button.removeEventListener('click', Player.removePlayer);
-	button.addEventListener('click', Player.selectPlayer);
-
-	App.removeClass(buttonIcon, 'glyphicon-minus');
-	App.addClass(buttonIcon, 'glyphicon-plus');
-
-	App.removeClass(button, 'deselect-player');
-	App.addClass(button, 'select-player');
-
+	Player.setIcon(this.parentNode.parentNode, 'remove');
 	for (var i = 0; i < scorecard.length; i++) {
 		if (scorecard[i].id === playerId) {
 			scorecard.splice(i, 1);
 		}
 	};
+}
+
+Player.setIcon = function(parentDiv, action) {
+	if (action == 'select') {
+		var buttonIcon = parentDiv.querySelectorAll('.glyphicon-plus')[0];
+		var button = parentDiv.querySelectorAll('.select-player')[0];
+
+		button.removeEventListener('click', Player.selectPlayer);
+		button.addEventListener('click', Player.removePlayer);
+
+		App.removeClass(buttonIcon, 'glyphicon-plus');
+		App.addClass(buttonIcon, 'glyphicon-minus');
+
+		App.removeClass(button, 'select-player');
+		App.addClass(button, 'deselect-player');
+	} else {
+		var buttonIcon = parentDiv.querySelectorAll('.glyphicon-minus')[0];
+		var button = parentDiv.querySelectorAll('.deselect-player')[0];
+
+		button.removeEventListener('click', Player.removePlayer);
+		button.addEventListener('click', Player.selectPlayer);
+
+		App.removeClass(buttonIcon, 'glyphicon-minus');
+		App.addClass(buttonIcon, 'glyphicon-plus');
+
+		App.removeClass(button, 'deselect-player');
+		App.addClass(button, 'select-player');
+	}
 }
 
 /**
