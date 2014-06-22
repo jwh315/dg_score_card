@@ -1,5 +1,3 @@
-/*global App, document, Match, Player, XMLHttpRequest*/
-'use strict';
 /**
 *
 * functions that are either global to the app or js helper functions
@@ -74,6 +72,7 @@ var App = {
 var Match = {
 	match_id: '',
 	course: '',
+	players: [],
 
 	init: function() {
 		App.bindEvent('click', '#start_match', Match.startMatch);
@@ -93,7 +92,6 @@ var Match = {
 		var url = 'register-match/' + this.id;
 		App.ajax(url, 'GET', null, function(data) {
 			App.setContent(data.html);
-			// document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
 			Match.bindPlayerEvents();
 		});
 	},
@@ -109,7 +107,6 @@ var Match = {
 		var url = 'join-match/' + this.id;
 		App.ajax(url, 'GET', null, function(data) {
 			App.setContent(data.html);
-			// document.querySelectorAll('.active-match-name')[0].innerHTML = data.active_match
 			Match.bindPlayerEvents();
 		});
 	},
@@ -122,20 +119,73 @@ var Match = {
 		App.bindEvent('click', '.home', Match.goHome);
 		App.bindEvent('click', '.play', Match.play);
 		App.bindEvent('click', '#register-player', Player.register);
-		App.bindEvent('click', '.select-player', Player.selectPlayer);
+		App.bindEvent('click', '.select-player', Match.addPlayer);
 	},
 
 	play: function() {
-		if (scorecard.length > 0) {
+		if (Match.players.length > 0) {
 			App.ajax('play', 'GET', null, function(data) {
 				App.setContent(data.html);
 				Match.course = new Course(JSON.parse(data.holes));
 				Match.course.loadNextHole('forward');
+
+				for (var i = 0; i < Match.players.length; i++) {
+					Match.players[i].initScorecard(JSON.parse(data.holes));
+				};
 			});
 		} else {
 			App.displayErrorModal('You really should pick at least one player!');
 		}
 	},
+
+	addPlayer: function() {
+		var parentDiv = this.parentNode.parentNode;
+		var playerName = parentDiv.querySelectorAll('.player-name')[0].innerHTML;
+		var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
+
+		Match.setIcon(parentDiv, 'select');
+
+		Match.players.push(new Player(playerName, playerId));
+	},
+
+	removePlayer: function() {
+		var parentDiv = this.parentNode.parentNode;
+		var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
+		Match.setIcon(this.parentNode.parentNode, 'remove');
+		for (var i = 0; i < Match.players.length; i++) {
+			if (Match.players[i].id === playerId) {
+				Match.players.splice(i, 1);
+			}
+		};
+	},
+
+	setIcon: function(parentDiv, action) {
+		if (action == 'select') {
+			var buttonIcon = parentDiv.querySelectorAll('.glyphicon-plus')[0];
+			var button = parentDiv.querySelectorAll('.select-player')[0];
+
+			button.removeEventListener('click', Match.addPlayer);
+			button.addEventListener('click', Match.removePlayer);
+
+			App.removeClass(buttonIcon, 'glyphicon-plus');
+			App.addClass(buttonIcon, 'glyphicon-minus');
+
+			App.removeClass(button, 'select-player');
+			App.addClass(button, 'deselect-player');
+		} else {
+			var buttonIcon = parentDiv.querySelectorAll('.glyphicon-minus')[0];
+			var button = parentDiv.querySelectorAll('.deselect-player')[0];
+
+			button.removeEventListener('click', Match.removePlayer);
+			button.addEventListener('click', Match.addPlayer);
+
+			App.removeClass(buttonIcon, 'glyphicon-minus');
+			App.addClass(buttonIcon, 'glyphicon-plus');
+
+			App.removeClass(button, 'deselect-player');
+			App.addClass(button, 'select-player');
+		}
+	}
 }
 
 /**
@@ -148,40 +198,41 @@ var Match = {
 function Course(courseData) {
 	this.holes = courseData;
 	this.currentHole = 0;
-}
 
-Course.prototype.loadNextHole = function(direction) {
-	var par = '';
-	var distance = '';
-	if (direction == 'forward') {
-		if(!this.currentHole || this.currentHole == this.holes.length) {
-			par = this.holes[0].par;
-			distance = this.holes[0].distance;
-			this.currentHole = 1;
-		} else {
-			par = this.holes[this.currentHole].par;
-			distance = this.holes[this.currentHole].distance;
-			this.currentHole += 1;
+	this.loadNextHole = function(direction) {
+		var par = '';
+		var distance = '';
+		if (direction == 'forward') {
+			if(!this.currentHole || this.currentHole == this.holes.length) {
+				par = this.holes[0].par;
+				distance = this.holes[0].distance;
+				this.currentHole = 1;
+			} else {
+				par = this.holes[this.currentHole].par;
+				distance = this.holes[this.currentHole].distance;
+				this.currentHole += 1;
+			}
+		} else if (direction == 'back') {
+			if (this.currentHole === 1) {
+				this.currentHole = this.holes.length;
+				par = this.holes[this.holes.length - 1].par;
+				distance = this.holes[this.holes.length - 1].distance;
+			} else {
+				this.currentHole -= 1;
+				par = this.holes[this.currentHole - 1].par;
+				distance = this.holes[this.currentHole - 1].distance;
+			}
 		}
-	} else if (direction == 'back') {
-		if (this.currentHole === 1) {
-			this.currentHole = this.holes.length;
-			par = this.holes[this.holes.length - 1].par;
-			distance = this.holes[this.holes.length - 1].distance;
-		} else {
-			this.currentHole -= 1;
-			par = this.holes[this.currentHole - 1].par;
-			distance = this.holes[this.currentHole - 1].distance;
-		}
+		this.setHoleInfo(par, distance, this.currentHole);
 	}
-	this.setHoleInfo(par, distance, this.currentHole);
+
+	this.setHoleInfo = function(par, distance, holeNumber) {
+		document.querySelectorAll('.par')[0].innerHTML = par;
+		document.querySelectorAll('.distance')[0].innerHTML = distance;
+		document.querySelectorAll('.hole-number')[0].innerHTML = 'Hole ' + holeNumber;
+	}
 }
 
-Course.prototype.setHoleInfo = function(par, distance, holeNumber) {
-	document.querySelectorAll('.par')[0].innerHTML = par;
-	document.querySelectorAll('.distance')[0].innerHTML = distance;
-	document.querySelectorAll('.hole-number')[0].innerHTML = 'Hole ' + holeNumber;
-}
 
 /**
 *
@@ -191,6 +242,37 @@ Course.prototype.setHoleInfo = function(par, distance, holeNumber) {
 function Player(name, id) {
 	this.name = name;
 	this.id = id;
+	this.scorecard = [];
+
+	this.initScorecard = function(holes) {
+		this.loadScoreCardArray(holes);
+		this.buildScoreCardUI();
+	}
+
+	this.buildScoreCardUI = function() {
+		var newPlayerDiv = document.querySelectorAll('.player')[0].cloneNode(true);
+
+		newPlayerDiv.querySelectorAll('.player-name')[0].innerHTML = this.name;
+		newPlayerDiv.querySelectorAll('.player-id')[0].value = this.id;
+
+		newPlayerDiv.style.display = 'block';
+
+		document.getElementById('players').appendChild(newPlayerDiv);
+	}
+
+	this.loadScoreCardArray = function(holes) {
+		for (var i = 0; i < holes.length; i++) {
+			this.scorecard.push(new Hole(holes[i].hole_number, holes[i].par));
+		};
+	}
+
+	this.loadNextHole = function(direction) {
+
+	}
+
+	this.currentScore = function() {
+
+	}
 }
 
 Player.register = function() {
@@ -212,62 +294,15 @@ Player.register = function() {
 	});
 }
 
-Player.selectPlayer = function() {
-	var parentDiv = this.parentNode.parentNode;
-	var playerName = parentDiv.querySelectorAll('.player-name')[0].innerHTML;
-	var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
-
-	Player.setIcon(parentDiv, 'select');
-
-	scorecard.push(new Player(playerName, playerId));
-}
-
-Player.removePlayer = function() {
-	var parentDiv = this.parentNode.parentNode;
-	var playerId = parentDiv.querySelectorAll('.player-id')[0].value;
-	Player.setIcon(this.parentNode.parentNode, 'remove');
-	for (var i = 0; i < scorecard.length; i++) {
-		if (scorecard[i].id === playerId) {
-			scorecard.splice(i, 1);
-		}
-	};
-}
-
-Player.setIcon = function(parentDiv, action) {
-	if (action == 'select') {
-		var buttonIcon = parentDiv.querySelectorAll('.glyphicon-plus')[0];
-		var button = parentDiv.querySelectorAll('.select-player')[0];
-
-		button.removeEventListener('click', Player.selectPlayer);
-		button.addEventListener('click', Player.removePlayer);
-
-		App.removeClass(buttonIcon, 'glyphicon-plus');
-		App.addClass(buttonIcon, 'glyphicon-minus');
-
-		App.removeClass(button, 'select-player');
-		App.addClass(button, 'deselect-player');
-	} else {
-		var buttonIcon = parentDiv.querySelectorAll('.glyphicon-minus')[0];
-		var button = parentDiv.querySelectorAll('.deselect-player')[0];
-
-		button.removeEventListener('click', Player.removePlayer);
-		button.addEventListener('click', Player.selectPlayer);
-
-		App.removeClass(buttonIcon, 'glyphicon-minus');
-		App.addClass(buttonIcon, 'glyphicon-plus');
-
-		App.removeClass(button, 'deselect-player');
-		App.addClass(button, 'select-player');
-	}
-}
-
 /**
 *
-* array to hold player objects
+* Block comment
 *
 **/
-var scorecard = [
-
-]
+function Hole(number, par) {
+	this.number = number;
+	this.par = par;
+	this.score = par;
+}
 
 Match.init();
