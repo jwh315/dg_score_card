@@ -101,6 +101,7 @@ var Match = {
 			App.setContent(data.html);
 			App.bindEvent('click', '.existing-matches', Match.joinMatch);
 		});
+		Match.players = [];
 	},
 
 	joinMatch: function() {
@@ -109,6 +110,7 @@ var Match = {
 			App.setContent(data.html);
 			Match.bindPlayerEvents();
 		});
+		Match.players = [];
 	},
 
 	finishMatch: function() {
@@ -159,6 +161,17 @@ var Match = {
 		};
 	},
 
+	tallyScore: function(element) {
+		var bIncrement = (App.hasClass(element, 'increment')) ? true : false;
+		var playerId = element.parentNode.parentNode.querySelectorAll('.player-id')[0].value;
+		for (var i = 0; i < Match.players.length; i++) {
+			if (Match.players[i].id == playerId) {
+				Match.players[i].setHoleScore(document.getElementById('current-hole').value, bIncrement);
+				break;
+			}
+		};
+	},
+
 	setIcon: function(parentDiv, action) {
 		if (action == 'select') {
 			var buttonIcon = parentDiv.querySelectorAll('.glyphicon-plus')[0];
@@ -185,6 +198,12 @@ var Match = {
 			App.removeClass(button, 'deselect-player');
 			App.addClass(button, 'select-player');
 		}
+	},
+
+	setPlayerScores: function() {
+		for (var i = 0; i < Match.players.length; i++) {
+			Match.players[i].loadNextHole(document.getElementById('current-hole').value);
+		};
 	}
 }
 
@@ -230,6 +249,7 @@ function Course(courseData) {
 		document.querySelectorAll('.par')[0].innerHTML = par;
 		document.querySelectorAll('.distance')[0].innerHTML = distance;
 		document.querySelectorAll('.hole-number')[0].innerHTML = 'Hole ' + holeNumber;
+		document.getElementById('current-hole').value = holeNumber;
 	}
 }
 
@@ -243,10 +263,14 @@ function Player(name, id) {
 	this.name = name;
 	this.id = id;
 	this.scorecard = [];
+	this.score = 0;
+	this.playerRow = undefined;
 
 	this.initScorecard = function(holes) {
 		this.loadScoreCardArray(holes);
 		this.buildScoreCardUI();
+		this.calcCurrentScore();
+		this.displayCurrentScore();
 	}
 
 	this.buildScoreCardUI = function() {
@@ -256,22 +280,68 @@ function Player(name, id) {
 		newPlayerDiv.querySelectorAll('.player-id')[0].value = this.id;
 
 		newPlayerDiv.style.display = 'block';
-
 		document.getElementById('players').appendChild(newPlayerDiv);
+
+		this.playerRow = newPlayerDiv;
 	}
 
 	this.loadScoreCardArray = function(holes) {
 		for (var i = 0; i < holes.length; i++) {
-			this.scorecard.push(new Hole(holes[i].hole_number, holes[i].par));
+			this.scorecard.push(new Hole(parseInt(holes[i].hole_number), parseInt(holes[i].par)));
 		};
 	}
 
-	this.loadNextHole = function(direction) {
-
+	this.loadNextHole = function(holeNumber) {
+		this.playerRow.querySelectorAll('.hole-score')[0].innerHTML = this.scorecard[holeNumber - 1].score;
 	}
 
-	this.currentScore = function() {
+	this.calcCurrentScore = function() {
+		var par = 0;
+		var score = 0;
+		for (var i = 0; i < this.scorecard.length; i++) {
+			par += parseInt(this.scorecard[i].par);
+			score += parseInt(this.scorecard[i].score);
+		};
+		this.score = score - par;
+	}
 
+	this.displayCurrentScore = function() {
+		var sign = (this.score > 0) ? "+" : "";
+		this.playerRow.querySelectorAll('.current-score')[0].innerHTML = (!this.score) ? "( E )" : "( " + sign + this.score + " )";
+	}
+
+	this.getPlayerRow = function() {
+		if (this.playerRow != undefined) {
+			return;
+		}
+
+		var playerRows = document.querySelectorAll('.player');
+
+		for (var i = 0; i < playerRows.length; i++) {
+			if (playerRows[i].querySelectorAll('.player-id')[0].value == this.id) {
+				return playerRows[i];
+			}
+		};
+	}
+
+	this.setHoleScore = function(holeNumber, bIncrement) {
+		for (var i = 0; i < this.scorecard.length; i++) {
+			if (this.scorecard[i].number == holeNumber) {
+				if (this.scorecard[i].score > 1 || bIncrement) {
+					if (bIncrement) {
+						this.scorecard[i].score++;
+					} else {
+						this.scorecard[i].score--;
+
+					}
+
+					this.calcCurrentScore();
+					this.displayCurrentScore();
+					this.playerRow.querySelectorAll('.hole-score')[0].innerHTML = this.scorecard[i].score;
+				}
+				break;
+			}
+		};
 	}
 }
 

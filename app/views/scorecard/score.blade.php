@@ -1,7 +1,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-default btn-md btn-block" onclick="Match.course.loadNextHole('back');">
+			<button type="button" class="btn btn-default btn-md btn-block" onclick="Match.course.loadNextHole('back'); Match.setPlayerScores();">
 				<span class="glyphicon glyphicon-chevron-left"></span>
 			</button>
 		</div>
@@ -16,7 +16,7 @@
 			</div>
 		</div>
 		<div class="col-xs-4">
-			<button type="button" class="btn btn-default btn-md btn-block" onclick="Match.course.loadNextHole('forward');">
+			<button type="button" class="btn btn-default btn-md btn-block" onclick="Match.course.loadNextHole('forward'); Match.setPlayerScores();">
 				<span class="glyphicon glyphicon-chevron-right"></span>
 			</button>
 		</div>
@@ -34,13 +34,14 @@
 		</div>
 		<div class="col-xs-2 text-center"><h5 class="hole-score">3</h5></div>
 		<div class="col-xs-6 text-right">
-			<button type="button" class="btn btn-primary btn-lg">
+			<button type="button" class="btn btn-primary btn-lg increment" onclick="Match.tallyScore(this);">
 				<span class="glyphicon glyphicon-plus"></span>
 			</button>
-			<button type="button" class="btn btn-primary btn-lg">
+			<button type="button" class="btn btn-primary btn-lg decrement" onclick="Match.tallyScore(this);">
 				<span class="glyphicon glyphicon-minus"></span>
 			</button>
 		</div>
 		<input type="hidden" class="player-id" value="">
 	</div>
 </div>
+<input type="hidden" id="current-hole">
