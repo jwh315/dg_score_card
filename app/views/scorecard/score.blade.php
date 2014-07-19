@@ -28,8 +28,8 @@
 	<div class="row player" style="display: none;">
 		<div class="col-xs-4">
 			<h5>
-				<span class="player-name">Jacob</span>
 				<span class="current-score">( -1 )</span>
+				<span class="player-name">Jacob</span>
 			</h5>
 		</div>
 		<div class="col-xs-2 text-center"><h5 class="hole-score">3</h5></div>

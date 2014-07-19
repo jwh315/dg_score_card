@@ -57,3 +57,9 @@ body {
 	margin-top: -0.5px;
 	margin-bottom: 3.5px;
 }
+
+.loader {
+	display: none;
+	text-align: center;
+	margin-top: 200px;
+}
