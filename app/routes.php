@@ -41,8 +41,7 @@ Route::any('register-match/{id}', function($id)
 
 	$insertID = $match->id;
 	Session::put('current_match', $match->match_name);
-	$players = Player::all();
-	$json = array();
+	$players = Player::orderBy('player_name', 'ASC')->get();
 	$json['html'] = View::make('scorecard.player')->with('players', $players)->render();
 	$json['active_match'] = Session::get('current_match');
 	return Response::json($json);
@@ -76,6 +75,14 @@ Route::any('play/', function() {
 	$json = array();
 	$json['html'] = View::make('scorecard.score')->render();
 	$json['holes'] = Hole::where('course_id', $match->course_id)->get()->toJson();
+
+	return Response::json($json);
+});
+
+Route::any('player-view/', function()
+{
+	$json = array();
+	$json['html'] = View::make('scorecard.score')->render();
 	return Response::json($json);
 });
 

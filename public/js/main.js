@@ -79,9 +79,10 @@ var App = {
 		document.querySelectorAll('.modal')[0].style.display = "block";
 	},
 
-	setCookie: function(name, value) {
+	setCookie: function(name, players, course) {
 		var tmpObj = {};
-		tmpObj[name] = value;
+		tmpObj[name] = players;
+		tmpObj['course'] = course;
 		var date = new Date(+new Date + 12096e5);
 		var cookie = "active_match=" + JSON.stringify(tmpObj) + '; expires=' + date.toGMTString();
 		document.cookie = cookie;
@@ -116,27 +117,69 @@ var Match = {
 		App.bindEvent('click', '.mark-match-complete', Match.finishMatch);
 		App.bindEvent('click', '.close-modal', App.closeModal);
 
-		var active_match = App.getCookie('active_match');
+		Match.setHomeScreenButtons();
+	},
 
+	setHomeScreenButtons: function() {
+		var active_match = Match.getActiveMatch();
+		var resumeButton = document.querySelectorAll('.resume-match')[0];
 		if (active_match != undefined && Object.keys(active_match).length > 0) {
-			document.querySelectorAll('.resume-match')[0].style.display = 'block';
+			resumeButton.style.display = 'block';
+			resumeButton.addEventListener('click', Match.resumeMatch);
 		} else {
-			document.querySelectorAll('.resume-match')[0].style.display = 'none';
+			resumeButton.style.display = 'none';
+			resumeButton.removeEventListener('click', Match.resumeMatch);
 		}
+	},
+
+	resumeMatch: function() {
+		Match.players = {};
+		var active_match = Match.getActiveMatch();
+
+		App.ajax('player-view', 'GET', null, function(data) {
+			App.setContent(data.html);
+			for (var match_id in active_match) {
+				if (match_id != 'course') {
+					Match.match_id = match_id;
+
+					for (var player_id in active_match[match_id]) {
+						if (parseInt(player_id)) {
+							var name = active_match[match_id][player_id].name;
+							Match.players[player_id] = new Player(name, player_id);
+							Match.players[player_id].scorecard = active_match[match_id][player_id].scorecard;
+							Match.players[player_id].score = active_match[match_id][player_id].score;
+							Match.players[player_id].resumeMatch();
+							Match.players[player_id].loadNextHole(active_match['course'].currentHole);
+						}
+					}
+				} else if (match_id == 'course') {
+					Match.course = new Course(active_match['course'].holes);
+					Match.course.currentHole = active_match['course'].currentHole;
+					var hole = Match.course.holes[Match.course.currentHole - 1];
+					Match.course.setHoleInfo(hole.par, hole.distance, Match.course.currentHole);
+				}
+			}
+		});
+
+	},
+
+	getActiveMatch: function() {
+		return App.getCookie('active_match');
 	},
 
 	startMatch: function() {
 		App.ajax('start-match', 'GET', null, function(data) {
-			Match.match_id = data.active_match;
 			App.setContent(data.html);
 			App.bindEvent('click', '.course', Match.registerCourse);
 		});
+		Match.players = {};
 	},
 
 	registerCourse: function() {
 		var url = 'register-match/' + this.id;
 		App.ajax(url, 'GET', null, function(data) {
 			App.setContent(data.html);
+			Match.match_id = data.active_match;
 			Match.bindPlayerEvents();
 		});
 	},
@@ -152,9 +195,9 @@ var Match = {
 	joinMatch: function() {
 		var url = 'join-match/' + this.id;
 		App.ajax(url, 'GET', null, function(data) {
-			Match.match_id = data.active_match;
 			App.setContent(data.html);
 			Match.bindPlayerEvents();
+			Match.match_id = data.active_match;
 		});
 		Match.players = {};
 	},
@@ -251,7 +294,7 @@ var Match = {
 		for (var id in Match.players) {
 			Match.players[id].loadNextHole(document.getElementById('current-hole').value);
 		}
-		App.setCookie(Match.match_id, Match.players);
+		App.setCookie(Match.match_id, Match.players, Match.course);
 	}
 }
 
@@ -319,6 +362,11 @@ function Player(name, id) {
 		this.loadScoreCardArray(holes);
 		this.buildScoreCardUI();
 		this.calcCurrentScore();
+		this.displayCurrentScore();
+	},
+
+	this.resumeMatch = function() {
+		this.buildScoreCardUI();
 		this.displayCurrentScore();
 	}
 
