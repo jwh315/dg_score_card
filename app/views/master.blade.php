@@ -42,6 +42,7 @@
     </div>
     <link rel="stylesheet" href="{{asset('css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{asset('css/custom.css')}}">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
     <script src="{{asset('js/bootstrap-without-jquery.js')}}"></script>
     <script src="{{asset('js/main.js')}}"></script>
 </body>

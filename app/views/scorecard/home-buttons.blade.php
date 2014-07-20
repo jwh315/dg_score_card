@@ -17,13 +17,14 @@
 		</div>
 	@endif
 
-	@if(Session::get('current_match'))
-		<div class="row spacer">
-			<div class="col-xs-1"></div>
-			<div class="col-xs-10">
-				<button id="play_round" type="button" class="btn btn-primary btn-lg btn-block">Resume Match</button>
-			</div>
-			<div class="col-xs-1"></div>
+
+	<div class="row spacer resume-match">
+		<div class="col-xs-1"></div>
+		<div class="col-xs-10">
+			<button id="play_round" type="button" class="btn btn-primary btn-lg btn-block">Resume Match</button>
 		</div>
-	@endif
+		<div class="col-xs-1"></div>
+	</div>
+
 </div>
+

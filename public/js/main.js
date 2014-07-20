@@ -80,14 +80,22 @@ var App = {
 	},
 
 	setCookie: function(name, value) {
-
-		for (var id in value) {
-			delete value[id].playerRow;
-		}
-
+		var tmpObj = {};
+		tmpObj[name] = value;
 		var date = new Date(+new Date + 12096e5);
-		var cookie = name + "=" + JSON.stringify(value) + date.toGMTString();
+		var cookie = "active_match=" + JSON.stringify(tmpObj) + '; expires=' + date.toGMTString();
 		document.cookie = cookie;
+	},
+
+	getCookie: function(name) {
+		var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+		if (result != undefined) {
+	 		return JSON.parse(result[1]);
+		}
+	},
+
+	deleteCookie: function(name) {
+		document.cookie = name + '=; expires=Thu, 01-Jan-1970 00:00:01;'
 	}
 }
 
@@ -107,10 +115,19 @@ var Match = {
 		App.bindEvent('click', '#join_match', Match.showExistingMatches);
 		App.bindEvent('click', '.mark-match-complete', Match.finishMatch);
 		App.bindEvent('click', '.close-modal', App.closeModal);
+
+		var active_match = App.getCookie('active_match');
+
+		if (active_match != undefined && Object.keys(active_match).length > 0) {
+			document.querySelectorAll('.resume-match')[0].style.display = 'block';
+		} else {
+			document.querySelectorAll('.resume-match')[0].style.display = 'none';
+		}
 	},
 
 	startMatch: function() {
 		App.ajax('start-match', 'GET', null, function(data) {
+			Match.match_id = data.active_match;
 			App.setContent(data.html);
 			App.bindEvent('click', '.course', Match.registerCourse);
 		});
@@ -135,6 +152,7 @@ var Match = {
 	joinMatch: function() {
 		var url = 'join-match/' + this.id;
 		App.ajax(url, 'GET', null, function(data) {
+			Match.match_id = data.active_match;
 			App.setContent(data.html);
 			Match.bindPlayerEvents();
 		});
@@ -233,6 +251,7 @@ var Match = {
 		for (var id in Match.players) {
 			Match.players[id].loadNextHole(document.getElementById('current-hole').value);
 		}
+		App.setCookie(Match.match_id, Match.players);
 	}
 }
 
@@ -295,7 +314,6 @@ function Player(name, id) {
 	this.id = id;
 	this.scorecard = {};
 	this.score = 0;
-	this.playerRow = undefined;
 
 	this.initScorecard = function(holes) {
 		this.loadScoreCardArray(holes);
@@ -312,19 +330,16 @@ function Player(name, id) {
 
 		newPlayerDiv.style.display = 'block';
 		document.getElementById('players').appendChild(newPlayerDiv);
-
-		this.playerRow = newPlayerDiv;
 	}
 
 	this.loadScoreCardArray = function(holes) {
 		for (var i = 0; i < holes.length; i++) {
 			this.scorecard[i] = new Hole(parseInt(holes[i].hole_number), parseInt(holes[i].par));
-			//this.scorecard.push(new Hole(parseInt(holes[i].hole_number), parseInt(holes[i].par)));
 		};
 	}
 
 	this.loadNextHole = function(holeNumber) {
-		this.playerRow.querySelectorAll('.hole-score')[0].innerHTML = this.scorecard[holeNumber - 1].score;
+		this.getPlayerRow().querySelectorAll('.hole-score')[0].innerHTML = this.scorecard[holeNumber - 1].score;
 	}
 
 	this.calcCurrentScore = function() {
@@ -344,14 +359,10 @@ function Player(name, id) {
 
 	this.displayCurrentScore = function() {
 		var sign = (this.score > 0) ? "+" : "";
-		this.playerRow.querySelectorAll('.current-score')[0].innerHTML = (!this.score) ? "( E )" : "( " + sign + this.score + " )";
+		this.getPlayerRow().querySelectorAll('.current-score')[0].innerHTML = (!this.score) ? "( E )" : "( " + sign + this.score + " )";
 	}
 
 	this.getPlayerRow = function() {
-		if (this.playerRow != undefined) {
-			return;
-		}
-
 		var playerRows = document.querySelectorAll('.player');
 
 		for (var i = 0; i < playerRows.length; i++) {
@@ -374,7 +385,7 @@ function Player(name, id) {
 
 					this.calcCurrentScore();
 					this.displayCurrentScore();
-					this.playerRow.querySelectorAll('.hole-score')[0].innerHTML = this.scorecard[id].score;
+					this.getPlayerRow().querySelectorAll('.hole-score')[0].innerHTML = this.scorecard[id].score;
 
 				}
 				break;
