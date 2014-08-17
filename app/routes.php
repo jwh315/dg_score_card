@@ -71,11 +71,9 @@ Route::any('show-existing/', function()
 
 Route::any('play/', function() {
 	$match = Match::where('match_name', Session::get('current_match'))->first();
-
 	$json = array();
 	$json['html'] = View::make('scorecard.score')->render();
 	$json['holes'] = Hole::where('course_id', $match->course_id)->get()->toJson();
-
 	return Response::json($json);
 });
 
@@ -96,5 +94,20 @@ Route::any('register-player/{name}', function($name){
 	$json['player_id'] = $player->id;
 	return Response::json($json);
 });
+
+Route::any('post-scores', function() {
+	$input = Input::all();
+	$match = Match::where('match_name', $input['matchId'])->first();
+	foreach ($input['players'] as $key => $value) {
+		$player = new Player();
+		$player->id = $value['id'];
+		$player->saveScoreCard($value['scorecard'], $match->id);
+	}
+
+	$json = array();
+	$json['leaderboard'] = $match->getLeaderBoard();
+	return Response::json($json);
+});
+
 
 

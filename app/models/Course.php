@@ -13,4 +13,9 @@ class Course extends Eloquent {
 	{
 		return $this->hasMany('Match');
 	}
+
+	public static function getPar($id)
+	{
+		return Hole::where('course_id', '=', $id)->sum('par');
+	}
 }

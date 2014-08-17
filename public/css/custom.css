@@ -63,3 +63,8 @@ body {
 	text-align: center;
 	margin-top: 200px;
 }
+
+button:active {
+	border-style: inset;
+	background: black;
+}

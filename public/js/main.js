@@ -66,8 +66,14 @@ var App = {
 				func(response);
 			}
 		};
-		httpRequest.open('GET', url);
-		httpRequest.send();
+		if (type == 'POST') {
+			httpRequest.open('POST', url);
+			httpRequest.setRequestHeader('Content-type', 'application/json');
+			httpRequest.send(JSON.stringify(data));
+		} else {
+			httpRequest.open('GET', url);
+			httpRequest.send();
+		}
 	},
 
 	closeModal: function() {
@@ -107,11 +113,13 @@ var App = {
 *
 **/
 var Match = {
-	match_id: '',
-	course: '',
+	matchId: undefined,
+	course: undefined,
 	players: {},
+	autoUpdate: undefined,
 
 	init: function() {
+		Match.stopAutoUpdate();
 		App.bindEvent('click', '#start_match', Match.startMatch);
 		App.bindEvent('click', '#join_match', Match.showExistingMatches);
 		App.bindEvent('click', '.mark-match-complete', Match.finishMatch);
@@ -138,27 +146,29 @@ var Match = {
 
 		App.ajax('player-view', 'GET', null, function(data) {
 			App.setContent(data.html);
-			for (var match_id in active_match) {
-				if (match_id != 'course') {
-					Match.match_id = match_id;
+			for (var matchId in active_match) {
+				if (matchId != 'course') {
+					Match.matchId = matchId;
 
-					for (var player_id in active_match[match_id]) {
+					for (var player_id in active_match[matchId]) {
 						if (parseInt(player_id)) {
-							var name = active_match[match_id][player_id].name;
+							var name = active_match[matchId][player_id].name;
 							Match.players[player_id] = new Player(name, player_id);
-							Match.players[player_id].scorecard = active_match[match_id][player_id].scorecard;
-							Match.players[player_id].score = active_match[match_id][player_id].score;
+							Match.players[player_id].scorecard = active_match[matchId][player_id].scorecard;
+							Match.players[player_id].score = active_match[matchId][player_id].score;
 							Match.players[player_id].resumeMatch();
 							Match.players[player_id].loadNextHole(active_match['course'].currentHole);
+							Match.players[player_id].setHoleScore(active_match['course'].currentHole, 0);
 						}
 					}
-				} else if (match_id == 'course') {
+				} else if (matchId == 'course') {
 					Match.course = new Course(active_match['course'].holes);
 					Match.course.currentHole = active_match['course'].currentHole;
 					var hole = Match.course.holes[Match.course.currentHole - 1];
 					Match.course.setHoleInfo(hole.par, hole.distance, Match.course.currentHole);
 				}
 			}
+			Match.startAutoUpdate();
 		});
 
 	},
@@ -179,7 +189,7 @@ var Match = {
 		var url = 'register-match/' + this.id;
 		App.ajax(url, 'GET', null, function(data) {
 			App.setContent(data.html);
-			Match.match_id = data.active_match;
+			Match.matchId = data.active_match;
 			Match.bindPlayerEvents();
 		});
 	},
@@ -197,7 +207,7 @@ var Match = {
 		App.ajax(url, 'GET', null, function(data) {
 			App.setContent(data.html);
 			Match.bindPlayerEvents();
-			Match.match_id = data.active_match;
+			Match.matchId = data.active_match;
 		});
 		Match.players = {};
 	},
@@ -215,7 +225,8 @@ var Match = {
 
 	play: function() {
 		if (Object.keys(Match.players).length > 0) {
-			App.ajax('play', 'GET', null, function(data) {
+			App.ajax('play', 'POST', Match.players, function(data) {
+				console.log(data);
 				App.setContent(data.html);
 				Match.course = new Course(JSON.parse(data.holes));
 				Match.course.loadNextHole('forward');
@@ -223,10 +234,26 @@ var Match = {
 				for (var id in Match.players) {
 					Match.players[id].initScorecard(JSON.parse(data.holes));
 				}
+				Match.startAutoUpdate();
 			});
 		} else {
 			App.displayErrorModal('You really should pick at least one player!');
 		}
+	},
+
+	startAutoUpdate: function() {
+		Match.autoUpdate = setInterval(Match.postScoreData, 10000);
+	},
+
+	stopAutoUpdate: function() {
+		clearInterval(Match.autoUpdate);
+	},
+
+	postScoreData: function() {
+		console.log('posting');
+		App.ajax('post-scores', 'POST', {matchId: Match.matchId, players: Match.players}, function(data) {
+			console.log(data);
+		}, true);
 	},
 
 	addPlayer: function() {
@@ -251,7 +278,7 @@ var Match = {
 	},
 
 	tallyScore: function(element) {
-		var bIncrement = (App.hasClass(element, 'increment')) ? true : false;
+		var bIncrement = (App.hasClass(element, 'increment')) ? 1 : -1;
 		var playerId = element.parentNode.parentNode.querySelectorAll('.player-id')[0].value;
 
 		for (var id in Match.players) {
@@ -260,6 +287,7 @@ var Match = {
 				break;
 			}
 		}
+		App.setCookie(Match.matchId, Match.players, Match.course);
 	},
 
 	setIcon: function(parentDiv, action) {
@@ -294,7 +322,7 @@ var Match = {
 		for (var id in Match.players) {
 			Match.players[id].loadNextHole(document.getElementById('current-hole').value);
 		}
-		App.setCookie(Match.match_id, Match.players, Match.course);
+
 	}
 }
 
@@ -382,7 +410,7 @@ function Player(name, id) {
 
 	this.loadScoreCardArray = function(holes) {
 		for (var i = 0; i < holes.length; i++) {
-			this.scorecard[i] = new Hole(parseInt(holes[i].hole_number), parseInt(holes[i].par));
+			this.scorecard[i] = new Hole(parseInt(holes[i].id), parseInt(holes[i].hole_number), parseInt(holes[i].par));
 		};
 	}
 
@@ -420,16 +448,23 @@ function Player(name, id) {
 		};
 	}
 
-	this.setHoleScore = function(holeNumber, bIncrement) {
+	this.setHoleScore = function(holeNumber, iIncrement) {
 		for (var id in this.scorecard) {
 			if (this.scorecard[id].number == holeNumber) {
-				if (this.scorecard[id].score > 1 || bIncrement) {
-					if (bIncrement) {
-						this.scorecard[id].score++;
-					} else {
-						this.scorecard[id].score--;
-
+				if (this.scorecard[id].score > 1 || iIncrement == 1) {
+					switch (iIncrement) {
+						case 1:
+							this.scorecard[id].score++;
+							break;
+						case -1:
+							this.scorecard[id].score--;
+							break;
 					}
+					// if (iIncrement) {
+					// 	this.scorecard[id].score++;
+					// } else {
+					// 	this.scorecard[id].score--;
+					// }
 
 					this.calcCurrentScore();
 					this.displayCurrentScore();
@@ -466,7 +501,8 @@ Player.register = function() {
 * Block comment
 *
 **/
-function Hole(number, par) {
+function Hole(id, number, par) {
+	this.id = id;
 	this.number = number;
 	this.par = par;
 	this.score = par;
