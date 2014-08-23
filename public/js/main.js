@@ -202,7 +202,9 @@ var Match = {
 		App.ajax('show-existing', 'GET', null, function(data) {
 			App.setContent(data.html);
 			App.bindEvent('mousedown', '.existing-matches', Match.recordMouseEvent);
+			App.bindEvent('touchstart', '.existing-matches', Match.recordMouseEvent);
 			App.bindEvent('mouseup', '.existing-matches', Match.joinMatch);
+			App.bindEvent('touchend', '.existing-matches', Match.joinMatch);
 		});
 		Match.players = {};
 	},
