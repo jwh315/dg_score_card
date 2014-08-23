@@ -18,7 +18,8 @@ class Player extends Eloquent {
 							->where('match_id', '=', $matchId)
 							->where('hole_id', '=', $value['id'])->first();
 
-			if (!$score) {
+			if (!$score)
+			{
 				$score = new Score;
 				$score->player_id = $this->id;
 				$score->match_id = $matchId;

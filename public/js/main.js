@@ -168,6 +168,7 @@ var Match = {
 					Match.course.setHoleInfo(hole.par, hole.distance, Match.course.currentHole);
 				}
 			}
+			App.bindEvent('click', '#toggle_leaderboard', Match.toggleLeaderboard);
 			Match.startAutoUpdate();
 		});
 
@@ -234,10 +235,26 @@ var Match = {
 				for (var id in Match.players) {
 					Match.players[id].initScorecard(JSON.parse(data.holes));
 				}
+				App.bindEvent('click', '#toggle_leaderboard', Match.toggleLeaderboard);
 				Match.startAutoUpdate();
 			});
 		} else {
 			App.displayErrorModal('You really should pick at least one player!');
+		}
+	},
+
+	toggleLeaderboard: function() {
+		var score = document.getElementById('scorecard_container');
+		var leaderboard = document.getElementById('leaderboard');
+		var button = document.getElementById('toggle_leaderboard');
+		if (score.offsetParent != null) {
+			score.style.display = 'none';
+			leaderboard.style.display = 'block';
+			button.innerHTML = 'View Scorecard';
+		} else {
+			leaderboard.style.display = 'none';
+			score.style.display = 'block';
+			button.innerHTML = 'View Leaderboard';
 		}
 	},
 
@@ -250,9 +267,8 @@ var Match = {
 	},
 
 	postScoreData: function() {
-		console.log('posting');
 		App.ajax('post-scores', 'POST', {matchId: Match.matchId, players: Match.players}, function(data) {
-			console.log(data);
+			document.getElementById('leaderboard').innerHTML = data.leaderboard;
 		}, true);
 	},
 

@@ -68,3 +68,11 @@ button:active {
 	border-style: inset;
 	background: black;
 }
+
+#leaderboard {
+	display: none;
+}
+
+.date-stamp {
+	font-size: .75em;
+}

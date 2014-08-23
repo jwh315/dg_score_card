@@ -105,7 +105,7 @@ Route::any('post-scores', function() {
 	}
 
 	$json = array();
-	$json['leaderboard'] = $match->getLeaderBoard();
+	$json['leaderboard'] = View::make('scorecard.leaderboard')->with('leaderboard', $match->getLeaderBoard())->render();
 	return Response::json($json);
 });
 
