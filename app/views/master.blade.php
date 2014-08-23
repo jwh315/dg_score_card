@@ -22,7 +22,7 @@
         @yield('content')
     </div>
 
-    <div class="modal">
+    <div class="modal error-modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

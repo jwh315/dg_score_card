@@ -84,7 +84,8 @@ Route::any('player-view/', function()
 	return Response::json($json);
 });
 
-Route::any('register-player/{name}', function($name){
+Route::any('register-player/{name}', function($name)
+{
 	$player = new Player;
 	$player->player_name = strtolower($name);
 	$player->handicap = 0;
@@ -95,7 +96,8 @@ Route::any('register-player/{name}', function($name){
 	return Response::json($json);
 });
 
-Route::any('post-scores', function() {
+Route::any('post-scores', function()
+{
 	$input = Input::all();
 	$match = Match::where('match_name', $input['matchId'])->first();
 	foreach ($input['players'] as $key => $value) {
@@ -106,6 +108,18 @@ Route::any('post-scores', function() {
 
 	$json = array();
 	$json['leaderboard'] = View::make('scorecard.leaderboard')->with('leaderboard', $match->getLeaderBoard())->render();
+	return Response::json($json);
+});
+
+Route::any('delete-match', function()
+{
+	$input = Input::get('id');
+	Log::info($input);
+	$match = Match::where('id', $input)->first();
+	$match->complete = 1;
+	$match->save();
+	$json = array();
+	$json['success'] = true;
 	return Response::json($json);
 });
 

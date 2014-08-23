@@ -77,12 +77,12 @@ var App = {
 	},
 
 	closeModal: function() {
-		document.querySelectorAll('.modal')[0].style.display = "none";
+		document.querySelectorAll('.error-modal')[0].style.display = "none";
 	},
 
 	displayErrorModal: function(msg) {
 		document.querySelectorAll('.err-msg')[0].innerHTML = msg;
-		document.querySelectorAll('.modal')[0].style.display = "block";
+		document.querySelectorAll('.error-modal')[0].style.display = "block";
 	},
 
 	setCookie: function(name, players, course) {
@@ -117,6 +117,9 @@ var Match = {
 	course: undefined,
 	players: {},
 	autoUpdate: undefined,
+	mouseDownTime: undefined,
+	deleteMatchInfo: [],
+	selectedMatchID: undefined,
 
 	init: function() {
 		Match.stopAutoUpdate();
@@ -198,19 +201,59 @@ var Match = {
 	showExistingMatches: function() {
 		App.ajax('show-existing', 'GET', null, function(data) {
 			App.setContent(data.html);
-			App.bindEvent('click', '.existing-matches', Match.joinMatch);
+			App.bindEvent('mousedown', '.existing-matches', Match.recordMouseEvent);
+			App.bindEvent('mouseup', '.existing-matches', Match.joinMatch);
 		});
 		Match.players = {};
 	},
 
+	recordMouseEvent: function() {
+		Match.mouseDownTime = new Date().getTime();
+	},
+
 	joinMatch: function() {
-		var url = 'join-match/' + this.id;
-		App.ajax(url, 'GET', null, function(data) {
-			App.setContent(data.html);
-			Match.bindPlayerEvents();
-			Match.matchId = data.active_match;
-		});
-		Match.players = {};
+		var time = new Date().getTime() - Match.mouseDownTime;
+		var bDeleteVisible = (this.innerHTML == 'Press to Delete') ? true : false;
+		Match.selectedMatchID = this.id;
+		if (time > 500 && !bDeleteVisible) {
+			Match.deleteMatchInfo.push({
+				'id': this.id,
+				'name': this.innerHTML
+			});
+			this.innerHTML = 'Press to Delete';
+		} else if (!bDeleteVisible) {
+			var url = 'join-match/' + this.id;
+			App.ajax(url, 'GET', null, function(data) {
+				App.setContent(data.html);
+				Match.bindPlayerEvents();
+				Match.matchId = data.active_match;
+			});
+			Match.players = {};
+		} else if (bDeleteVisible) {
+			document.querySelectorAll('.delete-match-modal')[0].style.display = "block";
+		}
+	},
+
+	deleteMatch: function() {
+		App.ajax('delete-match', 'POST', { 'id': Match.selectedMatchID }, function(data) {
+			var ele = document.getElementById(Match.selectedMatchID);
+			ele.parentNode.removeChild(ele);
+			Match.closeDeleteModal();
+		}, true);
+	},
+
+	closeDeleteModal: function() {
+		var ele = document.getElementById(Match.selectedMatchID);
+
+		if (ele) {
+			for (var i = 0; i < Match.deleteMatchInfo.length; i++) {
+				if (Match.deleteMatchInfo[i].id = Match.selectedMatchID) {
+					ele.innerHTML = Match.deleteMatchInfo[i].name;
+				}
+			};
+		}
+
+		document.querySelectorAll('.delete-match-modal')[0].style.display = "none";
 	},
 
 	finishMatch: function() {
@@ -236,6 +279,7 @@ var Match = {
 					Match.players[id].initScorecard(JSON.parse(data.holes));
 				}
 				App.bindEvent('click', '#toggle_leaderboard', Match.toggleLeaderboard);
+				App.setCookie(Match.matchId, Match.players, Match.course);
 				Match.startAutoUpdate();
 			});
 		} else {
