@@ -7,6 +7,7 @@ class Match extends Eloquent {
 
 	public function getLeaderBoard()
 	{
+		Log::info(__FILE__ . ' = ' . $this->id);
 		$par = Course::getPar($this->course_id);
 		$leaderboard = Score::groupBy('player_id')->join('players', 'player_id', '=', 'players.id')
 									 	  ->where('match_id', '=', $this->id)
@@ -14,11 +15,12 @@ class Match extends Eloquent {
 									 	  ->orderBy('player_name')
 										  ->get(
 										  			array(
-										  					'player_id',
-										  					'player_name',
+										  					'player_id as id',
+										  					'player_name as name',
 										  					DB::raw("SUM(score) - $par as total")
 									  					)
 										  		);
+		Log::info($leaderboard);
 		return $this->formatLeaderArray($leaderboard);
 	}
 
@@ -26,6 +28,7 @@ class Match extends Eloquent {
 	{
 		$array = array();
 		foreach ($leaderboard as $key => $value) {
+			Log::info($value);
 			if ($value['total'] < 0) {
 	          	$score = $value['total'];
 	        } else if ($value['total'] > 0) {
@@ -34,7 +37,7 @@ class Match extends Eloquent {
 	          	$score = 'E';
 	        }
 
-	        $array[] = array('player_id' => $value['player_id'], 'player_name' => $value['player_name'], 'total' => $score);
+	        $array[] = array('player_id' => $value['id'], 'player_name' => $value['name'], 'total' => $score);
 		}
 		return $array;
 	}

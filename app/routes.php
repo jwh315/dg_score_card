@@ -33,8 +33,9 @@ Route::any('start-match/', function()
 
 Route::any('register-match/{id}', function($id)
 {
+	$course = Course::find($id);
 	$match = new Match;
-	$match->match_name = substr(md5(microtime()), 0, 5);
+	$match->match_name = date('Y-m-d H:i:s') . ' - ' . $course->getCourseInitials();
 	$match->course_id = $id;
 	$match->complete = false;
 	$match->save();
@@ -100,8 +101,9 @@ Route::any('post-scores', function()
 {
 	$input = Input::all();
 	$match = Match::where('match_name', $input['matchId'])->first();
+	$match = Match::find($match['id']);
 	foreach ($input['players'] as $key => $value) {
-		$player = new Player();
+		$player = new Player;
 		$player->id = $value['id'];
 		$player->saveScoreCard($value['scorecard'], $match->id);
 	}
